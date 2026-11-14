@@ -1,0 +1,879 @@
+{
+  "processing_date": "2026-11-14T12:52:14+00:00",
+  "inputs": {
+    "MODIS": {
+      "archive": "MODIS C6.1.zip",
+      "archive_csv": "fire_archive_M-C61_846942.csv",
+      "ignored_csvs": [
+        "fire_nrt_M-C61_846942.csv"
+      ],
+      "collection": "MODIS Collection 6.1 (Terra + Aqua)"
+    },
+    "VIIRS": {
+      "archive": "SUOMI VIIRS C2.zip",
+      "archive_csv": "fire_archive_SV-C2_846954.csv",
+      "ignored_csvs": [
+        "fire_nrt_SV-C2_846954.csv"
+      ],
+      "collection": "VIIRS Suomi-NPP Collection 2"
+    }
+  },
+  "raw_statistics": {
+    "MODIS": {
+      "total_rows": 455872,
+      "columns": [
+        "latitude",
+        "longitude",
+        "brightness",
+        "scan",
+        "track",
+        "acq_date",
+        "acq_time",
+        "satellite",
+        "instrument",
+        "confidence",
+        "version",
+        "bright_t31",
+        "frp",
+        "daynight",
+        "type"
+      ],
+      "n_columns": 15,
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "missing_values_by_column": {
+        "latitude": 0,
+        "longitude": 0,
+        "brightness": 0,
+        "scan": 0,
+        "track": 0,
+        "acq_date": 0,
+        "acq_time": 0,
+        "satellite": 0,
+        "instrument": 0,
+        "confidence": 0,
+        "version": 0,
+        "bright_t31": 0,
+        "frp": 0,
+        "daynight": 0,
+        "type": 0
+      },
+      "missing_values": 0,
+      "exact_duplicates": 0,
+      "unparseable_dates": 0,
+      "first_date": "2000-11-01",
+      "last_date": "2026-08-27",
+      "unparseable_times": 0,
+      "satellite_counts": {
+        "Aqua": 354956,
+        "Terra": 100916
+      },
+      "instrument_counts": {
+        "MODIS": 455872
+      },
+      "satellite_coverage": {
+        "Aqua": [
+          "2002-07-18",
+          "2026-08-27"
+        ],
+        "Terra": [
+          "2000-11-01",
+          "2026-08-22"
+        ]
+      },
+      "confidence_class_counts": {
+        "nominal": 380300,
+        "high": 61887,
+        "low": 13685
+      },
+      "confidence_unknown": 0,
+      "nominal_plus_high": 442187,
+      "low_confidence_excluded": 13685,
+      "type_counts": {
+        "0": 448918,
+        "2": 6954
+      },
+      "unknown_types": [],
+      "version_counts": {
+        "6.03": 424629,
+        "61.03": 31243
+      },
+      "daynight_counts": {
+        "D": 450801,
+        "N": 5071
+      },
+      "numeric_parse_failures": {
+        "latitude": 0,
+        "longitude": 0,
+        "brightness": 0,
+        "scan": 0,
+        "track": 0,
+        "bright_t31": 0,
+        "frp": 0
+      },
+      "latitude_range": [
+        27.6406,
+        32.5236
+      ],
+      "longitude_range": [
+        73.8152,
+        77.6612
+      ],
+      "rows_outside_download_extent": 0,
+      "frp_range": [
+        1.6,
+        1104.7
+      ]
+    },
+    "VIIRS": {
+      "total_rows": 1291486,
+      "columns": [
+        "latitude",
+        "longitude",
+        "brightness",
+        "scan",
+        "track",
+        "acq_date",
+        "acq_time",
+        "satellite",
+        "instrument",
+        "confidence",
+        "version",
+        "bright_t31",
+        "frp",
+        "daynight",
+        "type"
+      ],
+      "n_columns": 15,
+      "missing_required_columns": [],
+      "unexpected_columns": [],
+      "missing_values_by_column": {
+        "latitude": 0,
+        "longitude": 0,
+        "brightness": 0,
+        "scan": 0,
+        "track": 0,
+        "acq_date": 0,
+        "acq_time": 0,
+        "satellite": 0,
+        "instrument": 0,
+        "confidence": 0,
+        "version": 0,
+        "bright_t31": 0,
+        "frp": 0,
+        "daynight": 0,
+        "type": 0
+      },
+      "missing_values": 0,
+      "exact_duplicates": 0,
+      "unparseable_dates": 0,
+      "first_date": "2012-01-20",
+      "last_date": "2026-07-31",
+      "unparseable_times": 0,
+      "satellite_counts": {
+        "SNPP": 1291486
+      },
+      "instrument_counts": {
+        "SNPP": 1291486
+      },
+      "satellite_coverage": {
+        "SNPP": [
+          "2012-01-20",
+          "2026-07-31"
+        ]
+      },
+      "confidence_raw_counts": {
+        "h": 48694,
+        "l": 157450,
+        "n": 1085342
+      },
+      "confidence_class_counts": {
+        "nominal": 1085342,
+        "low": 157450,
+        "high": 48694
+      },
+      "confidence_unknown": 0,
+      "nominal_plus_high": 1134036,
+      "low_confidence_excluded": 157450,
+      "type_counts": {
+        "0": 1284226,
+        "2": 7182,
+        "3": 78
+      },
+      "unknown_types": [],
+      "version_counts": {
+        "2": 1291486
+      },
+      "daynight_counts": {
+        "D": 1258980,
+        "N": 32506
+      },
+      "numeric_parse_failures": {
+        "latitude": 0,
+        "longitude": 0,
+        "brightness": 0,
+        "scan": 0,
+        "track": 0,
+        "bright_t31": 0,
+        "frp": 0
+      },
+      "latitude_range": [
+        27.64404,
+        32.5503
+      ],
+      "longitude_range": [
+        73.81358,
+        77.66328
+      ],
+      "rows_outside_download_extent": 0,
+      "frp_range": [
+        0.0,
+        296.83
+      ]
+    }
+  },
+  "expectation_checks": {
+    "MODIS": [
+      {
+        "check": "total_rows",
+        "expected": 455872,
+        "actual": 455872,
+        "match": true
+      },
+      {
+        "check": "first_date",
+        "expected": "2000-11-01",
+        "actual": "2000-11-01",
+        "match": true
+      },
+      {
+        "check": "last_date",
+        "expected": "2026-08-27",
+        "actual": "2026-08-27",
+        "match": true
+      },
+      {
+        "check": "n_columns",
+        "expected": 15,
+        "actual": 15,
+        "match": true
+      },
+      {
+        "check": "exact_duplicates",
+        "expected": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "check": "missing_values",
+        "expected": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "check": "satellite_counts",
+        "expected": {
+          "Terra": 100916,
+          "Aqua": 354956
+        },
+        "actual": {
+          "Aqua": 354956,
+          "Terra": 100916
+        },
+        "match": true
+      },
+      {
+        "check": "satellite_coverage",
+        "expected": {
+          "Terra": [
+            "2000-11-01",
+            "2026-08-22"
+          ],
+          "Aqua": [
+            "2002-07-18",
+            "2026-08-27"
+          ]
+        },
+        "actual": {
+          "Aqua": [
+            "2002-07-18",
+            "2026-08-27"
+          ],
+          "Terra": [
+            "2000-11-01",
+            "2026-08-22"
+          ]
+        },
+        "match": true
+      },
+      {
+        "check": "confidence_class_counts",
+        "expected": {
+          "low": 13685,
+          "nominal": 374592,
+          "high": 67595
+        },
+        "actual": {
+          "nominal": 380300,
+          "high": 61887,
+          "low": 13685
+        },
+        "match": false,
+        "explanation": "The file has 61,887 high (80-100) and 380,300 nominal (30-79) records. The brief expected 67,595 / 374,592. No single integer threshold reproduces 67,595, so the expected split appears to be a transcription error. The low count (13,685) and the nominal+high total (442,187) match exactly, so the Nominal + High analytical policy is unaffected."
+      },
+      {
+        "check": "nominal_plus_high",
+        "expected": 442187,
+        "actual": 442187,
+        "match": true
+      },
+      {
+        "check": "type_counts",
+        "expected": {
+          "0": 448918,
+          "2": 6954
+        },
+        "actual": {
+          "0": 448918,
+          "2": 6954
+        },
+        "match": true
+      },
+      {
+        "check": "version_counts",
+        "expected": {
+          "6.03": 424629,
+          "61.03": 31243
+        },
+        "actual": {
+          "6.03": 424629,
+          "61.03": 31243
+        },
+        "match": true
+      }
+    ],
+    "VIIRS": [
+      {
+        "check": "total_rows",
+        "expected": 1291486,
+        "actual": 1291486,
+        "match": true
+      },
+      {
+        "check": "first_date",
+        "expected": "2012-01-20",
+        "actual": "2012-01-20",
+        "match": true
+      },
+      {
+        "check": "last_date",
+        "expected": "2026-07-31",
+        "actual": "2026-07-31",
+        "match": true
+      },
+      {
+        "check": "n_columns",
+        "expected": 15,
+        "actual": 15,
+        "match": true
+      },
+      {
+        "check": "exact_duplicates",
+        "expected": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "check": "missing_values",
+        "expected": 0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "check": "confidence_class_counts",
+        "expected": {
+          "low": 157450,
+          "nominal": 1085342,
+          "high": 48694
+        },
+        "actual": {
+          "nominal": 1085342,
+          "low": 157450,
+          "high": 48694
+        },
+        "match": true
+      },
+      {
+        "check": "nominal_plus_high",
+        "expected": 1134036,
+        "actual": 1134036,
+        "match": true
+      },
+      {
+        "check": "type_counts",
+        "expected": {
+          "0": 1284226,
+          "2": 7182,
+          "3": 78
+        },
+        "actual": {
+          "0": 1284226,
+          "2": 7182,
+          "3": 78
+        },
+        "match": true
+      }
+    ]
+  },
+  "confidence_policy": {
+    "name": "nominal_high",
+    "label": "Nominal + High confidence",
+    "modis_rule": "confidence >= 30",
+    "viirs_rule": "confidence in ['n', 'h']",
+    "counts": {
+      "MODIS": {
+        "input": 455872,
+        "retained": 442187,
+        "excluded_low_confidence": 13685,
+        "excluded_unknown_confidence": 0
+      },
+      "VIIRS": {
+        "input": 1291486,
+        "retained": 1134036,
+        "excluded_low_confidence": 157450,
+        "excluded_unknown_confidence": 0
+      }
+    }
+  },
+  "geographic_filter": {
+    "regions": [
+      "Punjab",
+      "Haryana"
+    ],
+    "method": "point-in-polygon (Shapely) against geoBoundaries ADM1 state polygons",
+    "source_crs": "EPSG:4326",
+    "projected_crs": "EPSG:32643",
+    "counts_after_confidence_filter": {
+      "Aqua": {
+        "Haryana": 42777,
+        "Outside study area": 5255,
+        "Punjab": 294548
+      },
+      "Suomi-NPP": {
+        "Haryana": 171613,
+        "Outside study area": 25732,
+        "Punjab": 936691
+      },
+      "Terra": {
+        "Haryana": 21522,
+        "Outside study area": 3147,
+        "Punjab": 74938
+      }
+    },
+    "boundaries": {
+      "name": "geoBoundaries gbOpen, India ADM1 (State / Union Territory)",
+      "api_url": "https://www.geoboundaries.org/api/current/gbOpen/IND/ADM1/",
+      "download_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM1/geoBoundaries-IND-ADM1.geojson",
+      "boundary_id": "IND-ADM1-1811400",
+      "admin_level": "ADM1",
+      "upstream_source": "DataMeet India community, Election Commission of India",
+      "license": "Creative Commons Attribution 2.5 India (CC BY 2.5 IN)",
+      "year_represented": "2011",
+      "citation": "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866.",
+      "crs": "EPSG:4326",
+      "downloaded_at": "2026-11-14T12:48:17+00:00",
+      "files": {
+        "Punjab": "punjab.geojson",
+        "Haryana": "haryana.geojson"
+      },
+      "source_names": {
+        "Punjab": "Punjab",
+        "Haryana": "Haryāna"
+      },
+      "diagnostics": {
+        "Punjab": {
+          "area_km2": 50320.2,
+          "geometry_type": "Polygon",
+          "bounds_wgs84": [
+            73.87985,
+            29.54208,
+            76.93942,
+            32.51275
+          ],
+          "overlap_with_other_regions_km2": 0.0
+        },
+        "Haryana": {
+          "area_km2": 44184.3,
+          "geometry_type": "Polygon",
+          "bounds_wgs84": [
+            74.47364,
+            27.6526,
+            77.60434,
+            30.9286
+          ],
+          "overlap_with_other_regions_km2": 0.0
+        }
+      },
+      "firms_download_polygon_coverage": {
+        "Punjab": {
+          "state_area_km2": 50320.2,
+          "area_outside_download_polygon_km2": 0.0,
+          "percent_covered": 100.0
+        },
+        "Haryana": {
+          "state_area_km2": 44184.3,
+          "area_outside_download_polygon_km2": 0.0,
+          "percent_covered": 100.0
+        }
+      }
+    }
+  },
+  "grid": {
+    "cell_size_m": 1000,
+    "crs": "EPSG:32643",
+    "note": "Cell counts are detections, not unique fires."
+  },
+  "retained": {
+    "MODIS": {
+      "retained_total": 433785,
+      "by_region": {
+        "Haryana": 64299,
+        "Punjab": 369486
+      },
+      "by_region_and_satellite": {
+        "Haryana": {
+          "Aqua": 42777,
+          "Terra": 21522
+        },
+        "Punjab": {
+          "Aqua": 294548,
+          "Terra": 74938
+        }
+      },
+      "by_confidence_class": {
+        "high": 60528,
+        "nominal": 373257
+      },
+      "by_detection_type": {
+        "0": 427197,
+        "2": 6588
+      },
+      "by_version": {
+        "6.03": 404331,
+        "61.03": 29454
+      },
+      "date_coverage": [
+        "2000-11-01",
+        "2026-08-27"
+      ]
+    },
+    "VIIRS": {
+      "retained_total": 1108304,
+      "by_region": {
+        "Haryana": 171613,
+        "Punjab": 936691
+      },
+      "by_region_and_satellite": {
+        "Haryana": {
+          "Suomi-NPP": 171613
+        },
+        "Punjab": {
+          "Suomi-NPP": 936691
+        }
+      },
+      "by_confidence_class": {
+        "high": 47664,
+        "nominal": 1060640
+      },
+      "by_detection_type": {
+        "0": 1101526,
+        "2": 6707,
+        "3": 71
+      },
+      "by_version": {
+        "2": 1108304
+      },
+      "date_coverage": [
+        "2012-01-20",
+        "2026-07-31"
+      ]
+    }
+  },
+  "satellite_observation_coverage": {
+    "Aqua": [
+      "2002-07-18",
+      "2026-08-27"
+    ],
+    "Suomi-NPP": [
+      "2012-01-20",
+      "2026-07-31"
+    ],
+    "Terra": [
+      "2000-11-01",
+      "2026-08-22"
+    ]
+  },
+  "observation_gaps_over_20_days": [
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2003-06-14",
+      "next_detection": "2003-07-08",
+      "days_without_detection": 23
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2004-06-21",
+      "next_detection": "2004-07-20",
+      "days_without_detection": 28
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2005-06-20",
+      "next_detection": "2005-07-29",
+      "days_without_detection": 38
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2005-08-02",
+      "next_detection": "2005-08-25",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2008-06-12",
+      "next_detection": "2008-07-23",
+      "days_without_detection": 40
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2008-08-17",
+      "next_detection": "2008-09-11",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2009-07-26",
+      "next_detection": "2009-08-20",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2009-08-29",
+      "next_detection": "2009-09-21",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2011-08-28",
+      "next_detection": "2011-09-20",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2013-06-06",
+      "next_detection": "2013-07-05",
+      "days_without_detection": 28
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2015-07-04",
+      "next_detection": "2015-07-27",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2020-07-15",
+      "next_detection": "2020-08-05",
+      "days_without_detection": 20
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2022-07-17",
+      "next_detection": "2022-08-08",
+      "days_without_detection": 21
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2025-07-04",
+      "next_detection": "2025-07-27",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Aqua",
+      "last_detection_before": "2026-07-15",
+      "next_detection": "2026-08-06",
+      "days_without_detection": 21
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2000-12-30",
+      "next_detection": "2001-01-21",
+      "days_without_detection": 21
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2001-06-10",
+      "next_detection": "2001-07-05",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2001-08-11",
+      "next_detection": "2001-09-03",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2002-07-01",
+      "next_detection": "2002-08-02",
+      "days_without_detection": 31
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2002-12-29",
+      "next_detection": "2003-01-23",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2003-06-20",
+      "next_detection": "2003-07-14",
+      "days_without_detection": 23
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2003-08-28",
+      "next_detection": "2003-09-20",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2003-12-14",
+      "next_detection": "2004-01-08",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2004-06-16",
+      "next_detection": "2004-07-20",
+      "days_without_detection": 33
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2005-08-10",
+      "next_detection": "2005-08-31",
+      "days_without_detection": 20
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2007-07-11",
+      "next_detection": "2007-08-09",
+      "days_without_detection": 28
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2008-06-24",
+      "next_detection": "2008-07-18",
+      "days_without_detection": 23
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2008-08-03",
+      "next_detection": "2008-09-12",
+      "days_without_detection": 39
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2009-09-02",
+      "next_detection": "2009-09-29",
+      "days_without_detection": 26
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2009-12-27",
+      "next_detection": "2010-02-02",
+      "days_without_detection": 36
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2015-01-05",
+      "next_detection": "2015-01-28",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2016-07-12",
+      "next_detection": "2016-08-04",
+      "days_without_detection": 22
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2019-12-09",
+      "next_detection": "2020-01-03",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2020-12-30",
+      "next_detection": "2021-01-26",
+      "days_without_detection": 26
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2021-08-09",
+      "next_detection": "2021-09-05",
+      "days_without_detection": 26
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2022-01-02",
+      "next_detection": "2022-01-27",
+      "days_without_detection": 24
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2024-01-04",
+      "next_detection": "2024-01-30",
+      "days_without_detection": 25
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2024-12-26",
+      "next_detection": "2025-01-19",
+      "days_without_detection": 23
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2025-07-05",
+      "next_detection": "2025-08-19",
+      "days_without_detection": 44
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2025-12-01",
+      "next_detection": "2025-12-22",
+      "days_without_detection": 20
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2025-12-22",
+      "next_detection": "2026-01-21",
+      "days_without_detection": 29
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2026-01-22",
+      "next_detection": "2026-02-19",
+      "days_without_detection": 27
+    },
+    {
+      "satellite": "Terra",
+      "last_detection_before": "2026-07-15",
+      "next_detection": "2026-08-17",
+      "days_without_detection": 32
+    }
+  ],
+  "warnings": [
+    "MODIS: 'confidence_class_counts' expected {'low': 13685, 'nominal': 374592, 'high': 67595} but found {'nominal': 380300, 'high': 61887, 'low': 13685}"
+  ]
+}

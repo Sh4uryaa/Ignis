@@ -1,0 +1,57 @@
+{
+  "name": "geoBoundaries gbOpen, India ADM1 (State / Union Territory)",
+  "api_url": "https://www.geoboundaries.org/api/current/gbOpen/IND/ADM1/",
+  "download_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM1/geoBoundaries-IND-ADM1.geojson",
+  "boundary_id": "IND-ADM1-1811400",
+  "admin_level": "ADM1",
+  "upstream_source": "DataMeet India community, Election Commission of India",
+  "license": "Creative Commons Attribution 2.5 India (CC BY 2.5 IN)",
+  "year_represented": "2011",
+  "citation": "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866.",
+  "crs": "EPSG:4326",
+  "downloaded_at": "2026-11-14T12:48:17+00:00",
+  "files": {
+    "Punjab": "punjab.geojson",
+    "Haryana": "haryana.geojson"
+  },
+  "source_names": {
+    "Punjab": "Punjab",
+    "Haryana": "Haryāna"
+  },
+  "diagnostics": {
+    "Punjab": {
+      "area_km2": 50320.2,
+      "geometry_type": "Polygon",
+      "bounds_wgs84": [
+        73.87985,
+        29.54208,
+        76.93942,
+        32.51275
+      ],
+      "overlap_with_other_regions_km2": 0.0
+    },
+    "Haryana": {
+      "area_km2": 44184.3,
+      "geometry_type": "Polygon",
+      "bounds_wgs84": [
+        74.47364,
+        27.6526,
+        77.60434,
+        30.9286
+      ],
+      "overlap_with_other_regions_km2": 0.0
+    }
+  },
+  "firms_download_polygon_coverage": {
+    "Punjab": {
+      "state_area_km2": 50320.2,
+      "area_outside_download_polygon_km2": 0.0,
+      "percent_covered": 100.0
+    },
+    "Haryana": {
+      "state_area_km2": 44184.3,
+      "area_outside_download_polygon_km2": 0.0,
+      "percent_covered": 100.0
+    }
+  }
+}
