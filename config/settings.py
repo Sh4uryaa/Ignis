@@ -233,6 +233,26 @@ MIN_VALID_YEAR_PAIRS: int = 5
 BOOTSTRAP_ITERATIONS: int = 2_000
 BOOTSTRAP_SEED: int = 42
 INTERVAL_LEVEL: float = 0.95
+CALIBRATION_METHOD: str = "median_of_annual_monthly_ratios"
+
+# Supplementary leave-one-year-out cross-validation window: training years in
+# which Terra/Aqua overpass times were still stable (drift visible from 2022,
+# see overpass_times.csv). Diagnostic only; the primary validation is the
+# independent VALIDATION_START..VALIDATION_END hold-out.
+STABLE_ORBIT_CV_YEARS: tuple[int, int] = (2012, 2021)
+IST_OFFSET_HOURS: float = 5.5
+UNCERTAINTY_SCOPE: str = (
+    "95% bootstrap calibration-factor uncertainty interval only. Does not include "
+    "satellite measurement uncertainty, cloud omission, detection-algorithm "
+    "uncertainty, spatial heterogeneity or temporal fire variability."
+)
+
+# ---------------------------------------------------------------------------
+# Anomalies
+# ---------------------------------------------------------------------------
+# A month within +/- this percentage of its same-month historical median is
+# labelled "Near historical median".
+ANOMALY_NEAR_BAND_PCT: float = 20.0
 
 # ---------------------------------------------------------------------------
 # Visual identity
