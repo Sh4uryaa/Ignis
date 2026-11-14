@@ -1,0 +1,284 @@
+region,year,sensor,satellite,detection_type,detection_type_label,detection_count,confidence_policy
+Haryana,2000,MODIS,Terra,0,Presumed vegetation fire,54,nominal_high
+Haryana,2000,MODIS,Terra,2,Other static land source,5,nominal_high
+Haryana,2001,MODIS,Terra,0,Presumed vegetation fire,1064,nominal_high
+Haryana,2001,MODIS,Terra,2,Other static land source,14,nominal_high
+Haryana,2002,MODIS,Aqua,0,Presumed vegetation fire,515,nominal_high
+Haryana,2002,MODIS,Aqua,2,Other static land source,4,nominal_high
+Haryana,2002,MODIS,Terra,0,Presumed vegetation fire,1161,nominal_high
+Haryana,2002,MODIS,Terra,2,Other static land source,20,nominal_high
+Haryana,2003,MODIS,Aqua,0,Presumed vegetation fire,1206,nominal_high
+Haryana,2003,MODIS,Aqua,2,Other static land source,19,nominal_high
+Haryana,2003,MODIS,Terra,0,Presumed vegetation fire,890,nominal_high
+Haryana,2003,MODIS,Terra,2,Other static land source,12,nominal_high
+Haryana,2004,MODIS,Aqua,0,Presumed vegetation fire,1421,nominal_high
+Haryana,2004,MODIS,Aqua,2,Other static land source,19,nominal_high
+Haryana,2004,MODIS,Terra,0,Presumed vegetation fire,601,nominal_high
+Haryana,2004,MODIS,Terra,2,Other static land source,17,nominal_high
+Haryana,2005,MODIS,Aqua,0,Presumed vegetation fire,2043,nominal_high
+Haryana,2005,MODIS,Aqua,2,Other static land source,25,nominal_high
+Haryana,2005,MODIS,Terra,0,Presumed vegetation fire,1028,nominal_high
+Haryana,2005,MODIS,Terra,2,Other static land source,26,nominal_high
+Haryana,2006,MODIS,Aqua,0,Presumed vegetation fire,1373,nominal_high
+Haryana,2006,MODIS,Aqua,2,Other static land source,21,nominal_high
+Haryana,2006,MODIS,Terra,0,Presumed vegetation fire,936,nominal_high
+Haryana,2006,MODIS,Terra,2,Other static land source,18,nominal_high
+Haryana,2007,MODIS,Aqua,0,Presumed vegetation fire,1886,nominal_high
+Haryana,2007,MODIS,Aqua,2,Other static land source,31,nominal_high
+Haryana,2007,MODIS,Terra,0,Presumed vegetation fire,1112,nominal_high
+Haryana,2007,MODIS,Terra,2,Other static land source,19,nominal_high
+Haryana,2008,MODIS,Aqua,0,Presumed vegetation fire,1910,nominal_high
+Haryana,2008,MODIS,Aqua,2,Other static land source,34,nominal_high
+Haryana,2008,MODIS,Terra,0,Presumed vegetation fire,1061,nominal_high
+Haryana,2008,MODIS,Terra,2,Other static land source,16,nominal_high
+Haryana,2009,MODIS,Aqua,0,Presumed vegetation fire,1928,nominal_high
+Haryana,2009,MODIS,Aqua,2,Other static land source,29,nominal_high
+Haryana,2009,MODIS,Terra,0,Presumed vegetation fire,1316,nominal_high
+Haryana,2009,MODIS,Terra,2,Other static land source,20,nominal_high
+Haryana,2010,MODIS,Aqua,0,Presumed vegetation fire,1753,nominal_high
+Haryana,2010,MODIS,Aqua,2,Other static land source,210,nominal_high
+Haryana,2010,MODIS,Terra,0,Presumed vegetation fire,818,nominal_high
+Haryana,2010,MODIS,Terra,2,Other static land source,228,nominal_high
+Haryana,2011,MODIS,Aqua,0,Presumed vegetation fire,1941,nominal_high
+Haryana,2011,MODIS,Aqua,2,Other static land source,56,nominal_high
+Haryana,2011,MODIS,Terra,0,Presumed vegetation fire,889,nominal_high
+Haryana,2011,MODIS,Terra,2,Other static land source,64,nominal_high
+Haryana,2012,MODIS,Aqua,0,Presumed vegetation fire,2342,nominal_high
+Haryana,2012,MODIS,Aqua,2,Other static land source,38,nominal_high
+Haryana,2012,MODIS,Terra,0,Presumed vegetation fire,1120,nominal_high
+Haryana,2012,MODIS,Terra,2,Other static land source,31,nominal_high
+Haryana,2012,VIIRS,Suomi-NPP,0,Presumed vegetation fire,14851,nominal_high
+Haryana,2012,VIIRS,Suomi-NPP,2,Other static land source,492,nominal_high
+Haryana,2013,MODIS,Aqua,0,Presumed vegetation fire,2463,nominal_high
+Haryana,2013,MODIS,Aqua,2,Other static land source,39,nominal_high
+Haryana,2013,MODIS,Terra,0,Presumed vegetation fire,1062,nominal_high
+Haryana,2013,MODIS,Terra,2,Other static land source,28,nominal_high
+Haryana,2013,VIIRS,Suomi-NPP,0,Presumed vegetation fire,15058,nominal_high
+Haryana,2013,VIIRS,Suomi-NPP,2,Other static land source,660,nominal_high
+Haryana,2014,MODIS,Aqua,0,Presumed vegetation fire,2191,nominal_high
+Haryana,2014,MODIS,Aqua,2,Other static land source,41,nominal_high
+Haryana,2014,MODIS,Terra,0,Presumed vegetation fire,641,nominal_high
+Haryana,2014,MODIS,Terra,2,Other static land source,14,nominal_high
+Haryana,2014,VIIRS,Suomi-NPP,0,Presumed vegetation fire,14342,nominal_high
+Haryana,2014,VIIRS,Suomi-NPP,2,Other static land source,441,nominal_high
+Haryana,2015,MODIS,Aqua,0,Presumed vegetation fire,2215,nominal_high
+Haryana,2015,MODIS,Aqua,2,Other static land source,38,nominal_high
+Haryana,2015,MODIS,Terra,0,Presumed vegetation fire,766,nominal_high
+Haryana,2015,MODIS,Terra,2,Other static land source,16,nominal_high
+Haryana,2015,VIIRS,Suomi-NPP,0,Presumed vegetation fire,13941,nominal_high
+Haryana,2015,VIIRS,Suomi-NPP,2,Other static land source,310,nominal_high
+Haryana,2016,MODIS,Aqua,0,Presumed vegetation fire,2727,nominal_high
+Haryana,2016,MODIS,Aqua,2,Other static land source,37,nominal_high
+Haryana,2016,MODIS,Terra,0,Presumed vegetation fire,1023,nominal_high
+Haryana,2016,MODIS,Terra,2,Other static land source,24,nominal_high
+Haryana,2016,VIIRS,Suomi-NPP,0,Presumed vegetation fire,16570,nominal_high
+Haryana,2016,VIIRS,Suomi-NPP,2,Other static land source,241,nominal_high
+Haryana,2017,MODIS,Aqua,0,Presumed vegetation fire,2368,nominal_high
+Haryana,2017,MODIS,Aqua,2,Other static land source,31,nominal_high
+Haryana,2017,MODIS,Terra,0,Presumed vegetation fire,635,nominal_high
+Haryana,2017,MODIS,Terra,2,Other static land source,14,nominal_high
+Haryana,2017,VIIRS,Suomi-NPP,0,Presumed vegetation fire,14272,nominal_high
+Haryana,2017,VIIRS,Suomi-NPP,2,Other static land source,201,nominal_high
+Haryana,2018,MODIS,Aqua,0,Presumed vegetation fire,2065,nominal_high
+Haryana,2018,MODIS,Aqua,2,Other static land source,36,nominal_high
+Haryana,2018,MODIS,Terra,0,Presumed vegetation fire,802,nominal_high
+Haryana,2018,MODIS,Terra,2,Other static land source,17,nominal_high
+Haryana,2018,VIIRS,Suomi-NPP,0,Presumed vegetation fire,13272,nominal_high
+Haryana,2018,VIIRS,Suomi-NPP,2,Other static land source,303,nominal_high
+Haryana,2019,MODIS,Aqua,0,Presumed vegetation fire,1725,nominal_high
+Haryana,2019,MODIS,Aqua,2,Other static land source,34,nominal_high
+Haryana,2019,MODIS,Terra,0,Presumed vegetation fire,856,nominal_high
+Haryana,2019,MODIS,Terra,2,Other static land source,26,nominal_high
+Haryana,2019,VIIRS,Suomi-NPP,0,Presumed vegetation fire,11512,nominal_high
+Haryana,2019,VIIRS,Suomi-NPP,2,Other static land source,276,nominal_high
+Haryana,2020,MODIS,Aqua,0,Presumed vegetation fire,1400,nominal_high
+Haryana,2020,MODIS,Aqua,2,Other static land source,22,nominal_high
+Haryana,2020,MODIS,Terra,0,Presumed vegetation fire,494,nominal_high
+Haryana,2020,MODIS,Terra,2,Other static land source,20,nominal_high
+Haryana,2020,VIIRS,Suomi-NPP,0,Presumed vegetation fire,8690,nominal_high
+Haryana,2020,VIIRS,Suomi-NPP,2,Other static land source,249,nominal_high
+Haryana,2021,MODIS,Aqua,0,Presumed vegetation fire,2208,nominal_high
+Haryana,2021,MODIS,Aqua,2,Other static land source,25,nominal_high
+Haryana,2021,MODIS,Terra,0,Presumed vegetation fire,692,nominal_high
+Haryana,2021,MODIS,Terra,2,Other static land source,14,nominal_high
+Haryana,2021,VIIRS,Suomi-NPP,0,Presumed vegetation fire,14091,nominal_high
+Haryana,2021,VIIRS,Suomi-NPP,2,Other static land source,183,nominal_high
+Haryana,2022,MODIS,Aqua,0,Presumed vegetation fire,1306,nominal_high
+Haryana,2022,MODIS,Aqua,2,Other static land source,36,nominal_high
+Haryana,2022,MODIS,Terra,0,Presumed vegetation fire,387,nominal_high
+Haryana,2022,MODIS,Terra,2,Other static land source,28,nominal_high
+Haryana,2022,VIIRS,Suomi-NPP,0,Presumed vegetation fire,8101,nominal_high
+Haryana,2022,VIIRS,Suomi-NPP,2,Other static land source,184,nominal_high
+Haryana,2023,MODIS,Aqua,0,Presumed vegetation fire,737,nominal_high
+Haryana,2023,MODIS,Aqua,2,Other static land source,53,nominal_high
+Haryana,2023,MODIS,Terra,0,Presumed vegetation fire,265,nominal_high
+Haryana,2023,MODIS,Terra,2,Other static land source,80,nominal_high
+Haryana,2023,VIIRS,Suomi-NPP,0,Presumed vegetation fire,5821,nominal_high
+Haryana,2023,VIIRS,Suomi-NPP,2,Other static land source,374,nominal_high
+Haryana,2024,MODIS,Aqua,0,Presumed vegetation fire,861,nominal_high
+Haryana,2024,MODIS,Aqua,2,Other static land source,28,nominal_high
+Haryana,2024,MODIS,Terra,0,Presumed vegetation fire,379,nominal_high
+Haryana,2024,MODIS,Terra,2,Other static land source,19,nominal_high
+Haryana,2024,VIIRS,Suomi-NPP,0,Presumed vegetation fire,6576,nominal_high
+Haryana,2024,VIIRS,Suomi-NPP,2,Other static land source,270,nominal_high
+Haryana,2024,VIIRS,Suomi-NPP,3,Offshore detection,1,nominal_high
+Haryana,2025,MODIS,Aqua,0,Presumed vegetation fire,774,nominal_high
+Haryana,2025,MODIS,Aqua,2,Other static land source,17,nominal_high
+Haryana,2025,MODIS,Terra,0,Presumed vegetation fire,461,nominal_high
+Haryana,2025,MODIS,Terra,2,Other static land source,7,nominal_high
+Haryana,2025,VIIRS,Suomi-NPP,0,Presumed vegetation fire,5808,nominal_high
+Haryana,2025,VIIRS,Suomi-NPP,2,Other static land source,287,nominal_high
+Haryana,2026,MODIS,Aqua,0,Presumed vegetation fire,479,nominal_high
+Haryana,2026,MODIS,Aqua,2,Other static land source,17,nominal_high
+Haryana,2026,MODIS,Terra,0,Presumed vegetation fire,209,nominal_high
+Haryana,2026,MODIS,Terra,2,Other static land source,3,nominal_high
+Haryana,2026,VIIRS,Suomi-NPP,0,Presumed vegetation fire,4096,nominal_high
+Haryana,2026,VIIRS,Suomi-NPP,2,Other static land source,140,nominal_high
+Punjab,2000,MODIS,Terra,0,Presumed vegetation fire,76,nominal_high
+Punjab,2000,MODIS,Terra,2,Other static land source,2,nominal_high
+Punjab,2001,MODIS,Terra,0,Presumed vegetation fire,4092,nominal_high
+Punjab,2001,MODIS,Terra,2,Other static land source,49,nominal_high
+Punjab,2002,MODIS,Aqua,0,Presumed vegetation fire,7707,nominal_high
+Punjab,2002,MODIS,Aqua,2,Other static land source,107,nominal_high
+Punjab,2002,MODIS,Terra,0,Presumed vegetation fire,4908,nominal_high
+Punjab,2002,MODIS,Terra,2,Other static land source,72,nominal_high
+Punjab,2003,MODIS,Aqua,0,Presumed vegetation fire,9894,nominal_high
+Punjab,2003,MODIS,Aqua,2,Other static land source,154,nominal_high
+Punjab,2003,MODIS,Terra,0,Presumed vegetation fire,4239,nominal_high
+Punjab,2003,MODIS,Terra,2,Other static land source,59,nominal_high
+Punjab,2004,MODIS,Aqua,0,Presumed vegetation fire,9382,nominal_high
+Punjab,2004,MODIS,Aqua,2,Other static land source,134,nominal_high
+Punjab,2004,MODIS,Terra,0,Presumed vegetation fire,2748,nominal_high
+Punjab,2004,MODIS,Terra,2,Other static land source,28,nominal_high
+Punjab,2005,MODIS,Aqua,0,Presumed vegetation fire,14126,nominal_high
+Punjab,2005,MODIS,Aqua,2,Other static land source,212,nominal_high
+Punjab,2005,MODIS,Terra,0,Presumed vegetation fire,3983,nominal_high
+Punjab,2005,MODIS,Terra,2,Other static land source,60,nominal_high
+Punjab,2006,MODIS,Aqua,0,Presumed vegetation fire,9545,nominal_high
+Punjab,2006,MODIS,Aqua,2,Other static land source,138,nominal_high
+Punjab,2006,MODIS,Terra,0,Presumed vegetation fire,2878,nominal_high
+Punjab,2006,MODIS,Terra,2,Other static land source,40,nominal_high
+Punjab,2007,MODIS,Aqua,0,Presumed vegetation fire,13130,nominal_high
+Punjab,2007,MODIS,Aqua,2,Other static land source,191,nominal_high
+Punjab,2007,MODIS,Terra,0,Presumed vegetation fire,4344,nominal_high
+Punjab,2007,MODIS,Terra,2,Other static land source,55,nominal_high
+Punjab,2008,MODIS,Aqua,0,Presumed vegetation fire,12982,nominal_high
+Punjab,2008,MODIS,Aqua,2,Other static land source,148,nominal_high
+Punjab,2008,MODIS,Terra,0,Presumed vegetation fire,4199,nominal_high
+Punjab,2008,MODIS,Terra,2,Other static land source,65,nominal_high
+Punjab,2009,MODIS,Aqua,0,Presumed vegetation fire,12742,nominal_high
+Punjab,2009,MODIS,Aqua,2,Other static land source,166,nominal_high
+Punjab,2009,MODIS,Terra,0,Presumed vegetation fire,3643,nominal_high
+Punjab,2009,MODIS,Terra,2,Other static land source,52,nominal_high
+Punjab,2010,MODIS,Aqua,0,Presumed vegetation fire,13106,nominal_high
+Punjab,2010,MODIS,Aqua,2,Other static land source,151,nominal_high
+Punjab,2010,MODIS,Terra,0,Presumed vegetation fire,2528,nominal_high
+Punjab,2010,MODIS,Terra,2,Other static land source,40,nominal_high
+Punjab,2011,MODIS,Aqua,0,Presumed vegetation fire,13242,nominal_high
+Punjab,2011,MODIS,Aqua,2,Other static land source,156,nominal_high
+Punjab,2011,MODIS,Terra,0,Presumed vegetation fire,3560,nominal_high
+Punjab,2011,MODIS,Terra,2,Other static land source,44,nominal_high
+Punjab,2012,MODIS,Aqua,0,Presumed vegetation fire,15509,nominal_high
+Punjab,2012,MODIS,Aqua,2,Other static land source,230,nominal_high
+Punjab,2012,MODIS,Terra,0,Presumed vegetation fire,3820,nominal_high
+Punjab,2012,MODIS,Terra,2,Other static land source,50,nominal_high
+Punjab,2012,VIIRS,Suomi-NPP,0,Presumed vegetation fire,79468,nominal_high
+Punjab,2012,VIIRS,Suomi-NPP,2,Other static land source,397,nominal_high
+Punjab,2012,VIIRS,Suomi-NPP,3,Offshore detection,5,nominal_high
+Punjab,2013,MODIS,Aqua,0,Presumed vegetation fire,13428,nominal_high
+Punjab,2013,MODIS,Aqua,2,Other static land source,172,nominal_high
+Punjab,2013,MODIS,Terra,0,Presumed vegetation fire,3300,nominal_high
+Punjab,2013,MODIS,Terra,2,Other static land source,42,nominal_high
+Punjab,2013,VIIRS,Suomi-NPP,0,Presumed vegetation fire,73226,nominal_high
+Punjab,2013,VIIRS,Suomi-NPP,2,Other static land source,305,nominal_high
+Punjab,2013,VIIRS,Suomi-NPP,3,Offshore detection,1,nominal_high
+Punjab,2014,MODIS,Aqua,0,Presumed vegetation fire,14598,nominal_high
+Punjab,2014,MODIS,Aqua,2,Other static land source,174,nominal_high
+Punjab,2014,MODIS,Terra,0,Presumed vegetation fire,3066,nominal_high
+Punjab,2014,MODIS,Terra,2,Other static land source,44,nominal_high
+Punjab,2014,VIIRS,Suomi-NPP,0,Presumed vegetation fire,85840,nominal_high
+Punjab,2014,VIIRS,Suomi-NPP,2,Other static land source,139,nominal_high
+Punjab,2014,VIIRS,Suomi-NPP,3,Offshore detection,2,nominal_high
+Punjab,2015,MODIS,Aqua,0,Presumed vegetation fire,11588,nominal_high
+Punjab,2015,MODIS,Aqua,2,Other static land source,142,nominal_high
+Punjab,2015,MODIS,Terra,0,Presumed vegetation fire,2081,nominal_high
+Punjab,2015,MODIS,Terra,2,Other static land source,22,nominal_high
+Punjab,2015,VIIRS,Suomi-NPP,0,Presumed vegetation fire,71794,nominal_high
+Punjab,2015,VIIRS,Suomi-NPP,2,Other static land source,61,nominal_high
+Punjab,2016,MODIS,Aqua,0,Presumed vegetation fire,17093,nominal_high
+Punjab,2016,MODIS,Aqua,2,Other static land source,225,nominal_high
+Punjab,2016,MODIS,Terra,0,Presumed vegetation fire,2834,nominal_high
+Punjab,2016,MODIS,Terra,2,Other static land source,42,nominal_high
+Punjab,2016,VIIRS,Suomi-NPP,0,Presumed vegetation fire,96132,nominal_high
+Punjab,2016,VIIRS,Suomi-NPP,2,Other static land source,45,nominal_high
+Punjab,2016,VIIRS,Suomi-NPP,3,Offshore detection,6,nominal_high
+Punjab,2017,MODIS,Aqua,0,Presumed vegetation fire,11524,nominal_high
+Punjab,2017,MODIS,Aqua,2,Other static land source,110,nominal_high
+Punjab,2017,MODIS,Terra,0,Presumed vegetation fire,1685,nominal_high
+Punjab,2017,MODIS,Terra,2,Other static land source,24,nominal_high
+Punjab,2017,VIIRS,Suomi-NPP,0,Presumed vegetation fire,67427,nominal_high
+Punjab,2017,VIIRS,Suomi-NPP,2,Other static land source,48,nominal_high
+Punjab,2017,VIIRS,Suomi-NPP,3,Offshore detection,3,nominal_high
+Punjab,2018,MODIS,Aqua,0,Presumed vegetation fire,13423,nominal_high
+Punjab,2018,MODIS,Aqua,2,Other static land source,147,nominal_high
+Punjab,2018,MODIS,Terra,0,Presumed vegetation fire,2670,nominal_high
+Punjab,2018,MODIS,Terra,2,Other static land source,36,nominal_high
+Punjab,2018,VIIRS,Suomi-NPP,0,Presumed vegetation fire,70044,nominal_high
+Punjab,2018,VIIRS,Suomi-NPP,2,Other static land source,62,nominal_high
+Punjab,2018,VIIRS,Suomi-NPP,3,Offshore detection,9,nominal_high
+Punjab,2019,MODIS,Aqua,0,Presumed vegetation fire,11278,nominal_high
+Punjab,2019,MODIS,Aqua,2,Other static land source,141,nominal_high
+Punjab,2019,MODIS,Terra,0,Presumed vegetation fire,2490,nominal_high
+Punjab,2019,MODIS,Terra,2,Other static land source,35,nominal_high
+Punjab,2019,VIIRS,Suomi-NPP,0,Presumed vegetation fire,60070,nominal_high
+Punjab,2019,VIIRS,Suomi-NPP,2,Other static land source,31,nominal_high
+Punjab,2019,VIIRS,Suomi-NPP,3,Offshore detection,2,nominal_high
+Punjab,2020,MODIS,Aqua,0,Presumed vegetation fire,16675,nominal_high
+Punjab,2020,MODIS,Aqua,2,Other static land source,197,nominal_high
+Punjab,2020,MODIS,Terra,0,Presumed vegetation fire,1918,nominal_high
+Punjab,2020,MODIS,Terra,2,Other static land source,19,nominal_high
+Punjab,2020,VIIRS,Suomi-NPP,0,Presumed vegetation fire,83573,nominal_high
+Punjab,2020,VIIRS,Suomi-NPP,2,Other static land source,22,nominal_high
+Punjab,2020,VIIRS,Suomi-NPP,3,Offshore detection,2,nominal_high
+Punjab,2021,MODIS,Aqua,0,Presumed vegetation fire,16972,nominal_high
+Punjab,2021,MODIS,Aqua,2,Other static land source,179,nominal_high
+Punjab,2021,MODIS,Terra,0,Presumed vegetation fire,2663,nominal_high
+Punjab,2021,MODIS,Terra,2,Other static land source,41,nominal_high
+Punjab,2021,VIIRS,Suomi-NPP,0,Presumed vegetation fire,87316,nominal_high
+Punjab,2021,VIIRS,Suomi-NPP,2,Other static land source,62,nominal_high
+Punjab,2021,VIIRS,Suomi-NPP,3,Offshore detection,4,nominal_high
+Punjab,2022,MODIS,Aqua,0,Presumed vegetation fire,12313,nominal_high
+Punjab,2022,MODIS,Aqua,2,Other static land source,152,nominal_high
+Punjab,2022,MODIS,Terra,0,Presumed vegetation fire,2074,nominal_high
+Punjab,2022,MODIS,Terra,2,Other static land source,18,nominal_high
+Punjab,2022,VIIRS,Suomi-NPP,0,Presumed vegetation fire,60260,nominal_high
+Punjab,2022,VIIRS,Suomi-NPP,2,Other static land source,165,nominal_high
+Punjab,2022,VIIRS,Suomi-NPP,3,Offshore detection,3,nominal_high
+Punjab,2023,MODIS,Aqua,0,Presumed vegetation fire,9298,nominal_high
+Punjab,2023,MODIS,Aqua,2,Other static land source,183,nominal_high
+Punjab,2023,MODIS,Terra,0,Presumed vegetation fire,1004,nominal_high
+Punjab,2023,MODIS,Terra,2,Other static land source,92,nominal_high
+Punjab,2023,VIIRS,Suomi-NPP,0,Presumed vegetation fire,43518,nominal_high
+Punjab,2023,VIIRS,Suomi-NPP,2,Other static land source,529,nominal_high
+Punjab,2023,VIIRS,Suomi-NPP,3,Offshore detection,4,nominal_high
+Punjab,2024,MODIS,Aqua,0,Presumed vegetation fire,5542,nominal_high
+Punjab,2024,MODIS,Aqua,2,Other static land source,77,nominal_high
+Punjab,2024,MODIS,Terra,0,Presumed vegetation fire,1352,nominal_high
+Punjab,2024,MODIS,Terra,2,Other static land source,33,nominal_high
+Punjab,2024,VIIRS,Suomi-NPP,0,Presumed vegetation fire,23843,nominal_high
+Punjab,2024,VIIRS,Suomi-NPP,2,Other static land source,136,nominal_high
+Punjab,2024,VIIRS,Suomi-NPP,3,Offshore detection,17,nominal_high
+Punjab,2025,MODIS,Aqua,0,Presumed vegetation fire,4512,nominal_high
+Punjab,2025,MODIS,Aqua,2,Other static land source,50,nominal_high
+Punjab,2025,MODIS,Terra,0,Presumed vegetation fire,1345,nominal_high
+Punjab,2025,MODIS,Terra,2,Other static land source,27,nominal_high
+Punjab,2025,VIIRS,Suomi-NPP,0,Presumed vegetation fire,19765,nominal_high
+Punjab,2025,VIIRS,Suomi-NPP,2,Other static land source,75,nominal_high
+Punjab,2025,VIIRS,Suomi-NPP,3,Offshore detection,11,nominal_high
+Punjab,2026,MODIS,Aqua,0,Presumed vegetation fire,1185,nominal_high
+Punjab,2026,MODIS,Aqua,2,Other static land source,18,nominal_high
+Punjab,2026,MODIS,Terra,0,Presumed vegetation fire,344,nominal_high
+Punjab,2026,MODIS,Terra,2,Other static land source,3,nominal_high
+Punjab,2026,VIIRS,Suomi-NPP,0,Presumed vegetation fire,12249,nominal_high
+Punjab,2026,VIIRS,Suomi-NPP,2,Other static land source,19,nominal_high
+Punjab,2026,VIIRS,Suomi-NPP,3,Offshore detection,1,nominal_high
