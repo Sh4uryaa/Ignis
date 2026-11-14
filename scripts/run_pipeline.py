@@ -33,7 +33,23 @@ from processing.aggregate import (
     monthly_region_totals,
     monthly_sensor_counts,
 )
-from processing.build_outputs import build_quality_report, write_quality_report, write_table
+from processing.build_outputs import (
+    build_quality_report,
+    harmonization_summary,
+    read_table,
+    write_quality_report,
+    write_table,
+)
+from processing.calculate_anomalies import calculate_anomalies
+from processing.harmonize import calibration_factors, harmonize, training_pairs
+from processing.uncertainty import factor_intervals, uncertainty_intervals
+from processing.diagnostics import overpass_times
+from processing.validate import (
+    leave_one_year_out,
+    pooled_constant_factors,
+    validation_metrics,
+    validation_months,
+)
 from processing.clean_data import apply_confidence_policy
 from processing.coverage import monthly_coverage, observation_gaps
 from processing.extract_archives import ArchiveError, extract_historical_csv
@@ -81,8 +97,60 @@ def region_breakdown(df: pd.DataFrame) -> dict[str, dict[str, int]]:
     return {sat: {r: int(v) for r, v in row.items()} for sat, row in tab.iterrows()}
 
 
+def run_harmonization(totals: pd.DataFrame) -> dict:
+    """Phase 5: calibration, harmonized series, uncertainty, validation, anomalies."""
+    pairs = training_pairs(totals)
+    factors = calibration_factors(pairs)
+    intervals = factor_intervals(pairs)
+    factors = factors.merge(intervals[["region", "calendar_month", "factor_lower",
+                                       "factor_upper", "interval_status"]],
+                            on=["region", "calendar_month"], how="left")
+    harmonized = harmonize(totals, factors)
+    unc = uncertainty_intervals(harmonized, intervals)
+    val_rows = validation_months(totals, factors, constant_factors=pooled_constant_factors(pairs))
+    metrics = validation_metrics(val_rows)
+    cv_first, cv_last = S.STABLE_ORBIT_CV_YEARS
+    cv_rows = leave_one_year_out(pairs, cv_first, cv_last)
+    cv_metrics = validation_metrics(cv_rows, period=(str(cv_first), str(cv_last)),
+                                    validation_type="supplementary_stable_orbit_loyo_cv")
+    anomalies = calculate_anomalies(harmonized)
+
+    for key, df in [("training_pairs", pairs), ("calibration_factors", factors),
+                    ("harmonized_monthly", harmonized), ("uncertainty_intervals", unc),
+                    ("validation_results", val_rows), ("validation_metrics", metrics),
+                    ("validation_cv_results", cv_rows), ("validation_cv_metrics", cv_metrics),
+                    ("anomaly_results", anomalies)]:
+        write_table(df, key)
+    for _, f in factors[factors["validation_status"] != "available"].iterrows():
+        logger.warning("No calibration factor: %s month %s — %s",
+                       f["region"], f["calendar_month"], f["unavailable_reason"])
+    print("\nCalibration factors (VIIRS / MODIS, median of training years):")
+    print(factors.pivot(index="calendar_month", columns="region",
+                        values="calibration_factor").round(2).to_string())
+    print("\nValidation (held-out months):")
+    print(metrics[["region", "comparison", "n_months", "mae", "rmse", "wape_pct",
+                   "relative_bias_pct"]].round(1).to_string(index=False))
+    print(f"\nSupplementary stable-orbit leave-one-year-out CV ({cv_first}-{cv_last}):")
+    print(cv_metrics[["region", "comparison", "n_months", "wape_pct",
+                      "relative_bias_pct"]].round(1).to_string(index=False))
+    return harmonization_summary(factors, harmonized, metrics, unc, cv_metrics)
+
+
 def main() -> int:
     configure_logging()
+    if "--skip-ingest" in sys.argv:
+        # Re-run Phase 5 only, from the saved monthly region totals.
+        try:
+            totals = read_table("monthly_region_totals")
+        except FileNotFoundError as exc:
+            logger.error("%s", exc)
+            return 1
+        summary = run_harmonization(totals)
+        report = (json.loads(S.QUALITY_REPORT_PATH.read_text(encoding="utf-8"))
+                  if S.QUALITY_REPORT_PATH.exists() else {})
+        report["harmonization"] = summary
+        write_quality_report(report)
+        return 0
     try:
         boundaries = load_region_boundaries()
         df, inspection, warnings = load_and_standardize()
@@ -119,8 +187,10 @@ def main() -> int:
     write_table(in_region[DETECTION_COLUMNS], "detections")
     write_table(coverage, "sensor_coverage")
     write_table(monthly_sensor_counts(in_region), "monthly_sensor_counts")
-    write_table(monthly_region_totals(in_region, coverage), "monthly_region_totals")
+    totals = monthly_region_totals(in_region, coverage)
+    write_table(totals, "monthly_region_totals")
     write_table(detection_type_breakdown(in_region), "detection_type_breakdown")
+    write_table(overpass_times(in_region), "overpass_times")
     write_table(grid_monthly_summary(in_region), "grid_monthly")
 
     # Step 9: quality report.
@@ -132,6 +202,8 @@ def main() -> int:
         inspection, conf_stats, reg_stats, in_region,
         {k: [v[0].strftime("%Y-%m-%d"), v[1].strftime("%Y-%m-%d")] for k, v in sat_cov.items()},
         gaps, provenance, warnings)
+    # Phase 5 reads totals back from CSV so both entry points use identical input.
+    report["harmonization"] = run_harmonization(read_table("monthly_region_totals"))
     write_quality_report(report)
 
     print("\nRetained detections (Nominal + High, inside state boundaries):")

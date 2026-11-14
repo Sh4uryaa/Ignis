@@ -1,0 +1,7 @@
+region,comparison,validation_type,validation_start,validation_end,n_months,mae,rmse,wape_pct,relative_bias_pct,improves_on_raw_wape
+Punjab,raw_modis,supplementary_stable_orbit_loyo_cv,2012,2021,119,5087.008403361345,11288.106558704709,78.02089737294219,-78.00929774567689,
+Punjab,calibrated_seasonal,supplementary_stable_orbit_loyo_cv,2012,2021,119,812.2687424802488,1936.1598652283203,12.45799715102194,0.2694466196194782,True
+Punjab,constant_factor,supplementary_stable_orbit_loyo_cv,2012,2021,119,951.9271800997814,2260.5739147974127,14.599978403024409,0.07380171555613665,True
+Haryana,raw_modis,supplementary_stable_orbit_loyo_cv,2012,2021,114,960.1140350877193,1743.5384645005634,78.35645662414272,-78.35645662414272,
+Haryana,calibrated_seasonal,supplementary_stable_orbit_loyo_cv,2012,2021,114,139.0017900876821,283.53625882107264,11.344160524315795,1.090253320276477,True
+Haryana,constant_factor,supplementary_stable_orbit_loyo_cv,2012,2021,114,167.1452737668873,330.96067285834766,13.640995668445765,-0.18243199140443878,True

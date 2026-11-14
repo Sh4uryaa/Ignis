@@ -21,7 +21,62 @@ OUTPUT_FILES: dict[str, str] = {
     "monthly_region_totals": "monthly_region_totals.csv",
     "sensor_coverage": "sensor_monthly_coverage.csv",
     "detection_type_breakdown": "detection_type_breakdown.csv",
+    "training_pairs": "calibration_training_pairs.csv",
+    "calibration_factors": "calibration_factors.csv",
+    "harmonized_monthly": "harmonized_monthly.csv",
+    "uncertainty_intervals": "uncertainty_intervals.csv",
+    "validation_results": "validation_results.csv",
+    "validation_metrics": "validation_metrics.csv",
+    "anomaly_results": "anomaly_results.csv",
+    "validation_cv_results": "validation_stable_orbit_cv_results.csv",
+    "validation_cv_metrics": "validation_stable_orbit_cv_metrics.csv",
+    "overpass_times": "overpass_times.csv",
 }
+
+
+def read_table(key: str, base: Path = S.PROCESSED_DIR) -> pd.DataFrame:
+    """Read a configured output back from disk."""
+    path = output_path(key, base)
+    if not path.exists():
+        raise FileNotFoundError(f"{path} not found. Run `python -m scripts.run_pipeline`.")
+    return pd.read_parquet(path) if path.suffix == ".parquet" else pd.read_csv(path)
+
+
+def harmonization_summary(factors: pd.DataFrame, harmonized: pd.DataFrame,
+                          metrics: pd.DataFrame, intervals: pd.DataFrame,
+                          cv_metrics: pd.DataFrame | None = None) -> dict[str, Any]:
+    """Settings and headline results of Phase 5 for the quality report."""
+    unavailable = factors[factors["validation_status"] != "available"]
+    return {
+        "calibration_settings": {
+            "method": S.CALIBRATION_METHOD,
+            "training_period": [S.TRAINING_START, S.TRAINING_END],
+            "min_monthly_detections": S.MIN_MONTHLY_DETECTIONS,
+            "min_valid_year_pairs": S.MIN_VALID_YEAR_PAIRS,
+            "note": ("Combined Terra+Aqua is calibrated against one VIIRS satellite; "
+                     "factors include differences in observation opportunities as "
+                     "well as detection sensitivity."),
+        },
+        "validation_settings": {"validation_period": [S.VALIDATION_START, S.VALIDATION_END],
+                                "complete_overlapping_months_only": True},
+        "bootstrap_settings": {"iterations": S.BOOTSTRAP_ITERATIONS, "seed": S.BOOTSTRAP_SEED,
+                               "interval_level": S.INTERVAL_LEVEL,
+                               "scope": S.UNCERTAINTY_SCOPE},
+        "unavailable_factors": unavailable[["region", "calendar_month", "unavailable_reason"]]
+            .to_dict("records"),
+        "source_flag_counts": {
+            r: _counts(g["source_flag"]) for r, g in harmonized.groupby("region")},
+        "estimated_months_with_interval": int(len(intervals)),
+        "validation_metrics": metrics.to_dict("records"),
+        "supplementary_stable_orbit_cv": {
+            "years": list(S.STABLE_ORBIT_CV_YEARS),
+            "method": "leave-one-year-out; factors refitted without the held-out year",
+            "note": ("Supplementary diagnostic using training-period data while MODIS "
+                     "overpass times were stable. Not an independent hold-out and does "
+                     "not replace the primary validation."),
+            "metrics": [] if cv_metrics is None else cv_metrics.to_dict("records"),
+        },
+    }
 
 
 def output_path(key: str, base: Path = S.PROCESSED_DIR) -> Path:
