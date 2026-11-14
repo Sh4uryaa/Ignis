@@ -74,7 +74,7 @@ def build_deck(layers: list[pdk.Layer], bounds: list[float] | None, tooltip: dic
         lon = (bounds[0] + bounds[2]) / 2
         lat = (bounds[1] + bounds[3]) / 2
         span = max(bounds[2] - bounds[0], bounds[3] - bounds[1])
-        zoom = 6.4 if span < 3.2 else 6.1  # whole state visible at ~560 px height
+        zoom = 6.7 if span < 3.2 else 6.4  # whole state visible at ~560 px height
     else:
         lon, lat, zoom = 75.8, 30.0, 6.3
     return pdk.Deck(layers=layers, map_provider="carto", map_style="dark",
