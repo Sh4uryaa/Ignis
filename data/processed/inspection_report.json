@@ -1,0 +1,457 @@
+{
+  "generated_at": "2026-11-14T10:49:11+00:00",
+  "archives": {
+    "MODIS": {
+      "sensor": "MODIS",
+      "collection": "MODIS Collection 6.1 (Terra + Aqua)",
+      "zip_name": "MODIS C6.1.zip",
+      "archive_csv": "fire_archive_M-C61_846942.csv",
+      "ignored_csvs": [
+        "fire_nrt_M-C61_846942.csv"
+      ],
+      "statistics": {
+        "total_rows": 455872,
+        "columns": [
+          "latitude",
+          "longitude",
+          "brightness",
+          "scan",
+          "track",
+          "acq_date",
+          "acq_time",
+          "satellite",
+          "instrument",
+          "confidence",
+          "version",
+          "bright_t31",
+          "frp",
+          "daynight",
+          "type"
+        ],
+        "n_columns": 15,
+        "missing_required_columns": [],
+        "unexpected_columns": [],
+        "missing_values_by_column": {
+          "latitude": 0,
+          "longitude": 0,
+          "brightness": 0,
+          "scan": 0,
+          "track": 0,
+          "acq_date": 0,
+          "acq_time": 0,
+          "satellite": 0,
+          "instrument": 0,
+          "confidence": 0,
+          "version": 0,
+          "bright_t31": 0,
+          "frp": 0,
+          "daynight": 0,
+          "type": 0
+        },
+        "missing_values": 0,
+        "exact_duplicates": 0,
+        "unparseable_dates": 0,
+        "first_date": "2000-11-01",
+        "last_date": "2026-08-27",
+        "unparseable_times": 0,
+        "satellite_counts": {
+          "Aqua": 354956,
+          "Terra": 100916
+        },
+        "instrument_counts": {
+          "MODIS": 455872
+        },
+        "satellite_coverage": {
+          "Aqua": [
+            "2002-07-18",
+            "2026-08-27"
+          ],
+          "Terra": [
+            "2000-11-01",
+            "2026-08-22"
+          ]
+        },
+        "confidence_class_counts": {
+          "nominal": 380300,
+          "high": 61887,
+          "low": 13685
+        },
+        "confidence_unknown": 0,
+        "nominal_plus_high": 442187,
+        "low_confidence_excluded": 13685,
+        "type_counts": {
+          "0": 448918,
+          "2": 6954
+        },
+        "unknown_types": [],
+        "version_counts": {
+          "6.03": 424629,
+          "61.03": 31243
+        },
+        "daynight_counts": {
+          "D": 450801,
+          "N": 5071
+        },
+        "numeric_parse_failures": {
+          "latitude": 0,
+          "longitude": 0,
+          "brightness": 0,
+          "scan": 0,
+          "track": 0,
+          "bright_t31": 0,
+          "frp": 0
+        },
+        "latitude_range": [
+          27.6406,
+          32.5236
+        ],
+        "longitude_range": [
+          73.8152,
+          77.6612
+        ],
+        "rows_outside_download_extent": 0,
+        "frp_range": [
+          1.6,
+          1104.7
+        ]
+      },
+      "expectation_checks": [
+        {
+          "check": "total_rows",
+          "expected": 455872,
+          "actual": 455872,
+          "match": true
+        },
+        {
+          "check": "first_date",
+          "expected": "2000-11-01",
+          "actual": "2000-11-01",
+          "match": true
+        },
+        {
+          "check": "last_date",
+          "expected": "2026-08-27",
+          "actual": "2026-08-27",
+          "match": true
+        },
+        {
+          "check": "n_columns",
+          "expected": 15,
+          "actual": 15,
+          "match": true
+        },
+        {
+          "check": "exact_duplicates",
+          "expected": 0,
+          "actual": 0,
+          "match": true
+        },
+        {
+          "check": "missing_values",
+          "expected": 0,
+          "actual": 0,
+          "match": true
+        },
+        {
+          "check": "satellite_counts",
+          "expected": {
+            "Terra": 100916,
+            "Aqua": 354956
+          },
+          "actual": {
+            "Aqua": 354956,
+            "Terra": 100916
+          },
+          "match": true
+        },
+        {
+          "check": "satellite_coverage",
+          "expected": {
+            "Terra": [
+              "2000-11-01",
+              "2026-08-22"
+            ],
+            "Aqua": [
+              "2002-07-18",
+              "2026-08-27"
+            ]
+          },
+          "actual": {
+            "Aqua": [
+              "2002-07-18",
+              "2026-08-27"
+            ],
+            "Terra": [
+              "2000-11-01",
+              "2026-08-22"
+            ]
+          },
+          "match": true
+        },
+        {
+          "check": "confidence_class_counts",
+          "expected": {
+            "low": 13685,
+            "nominal": 374592,
+            "high": 67595
+          },
+          "actual": {
+            "nominal": 380300,
+            "high": 61887,
+            "low": 13685
+          },
+          "match": false,
+          "explanation": "The file has 61,887 high (80-100) and 380,300 nominal (30-79) records. The brief expected 67,595 / 374,592. No single integer threshold reproduces 67,595, so the expected split appears to be a transcription error. The low count (13,685) and the nominal+high total (442,187) match exactly, so the Nominal + High analytical policy is unaffected."
+        },
+        {
+          "check": "nominal_plus_high",
+          "expected": 442187,
+          "actual": 442187,
+          "match": true
+        },
+        {
+          "check": "type_counts",
+          "expected": {
+            "0": 448918,
+            "2": 6954
+          },
+          "actual": {
+            "0": 448918,
+            "2": 6954
+          },
+          "match": true
+        },
+        {
+          "check": "version_counts",
+          "expected": {
+            "6.03": 424629,
+            "61.03": 31243
+          },
+          "actual": {
+            "6.03": 424629,
+            "61.03": 31243
+          },
+          "match": true
+        }
+      ],
+      "all_expectations_met": false,
+      "warnings": [
+        "MODIS: 'confidence_class_counts' expected {'low': 13685, 'nominal': 374592, 'high': 67595} but found {'nominal': 380300, 'high': 61887, 'low': 13685}"
+      ],
+      "zip_members": {
+        "archive": [
+          "fire_archive_M-C61_846942.csv"
+        ],
+        "ignored_nrt": [
+          "fire_nrt_M-C61_846942.csv"
+        ],
+        "other": [
+          "Readme.txt"
+        ]
+      }
+    },
+    "VIIRS": {
+      "sensor": "VIIRS",
+      "collection": "VIIRS Suomi-NPP Collection 2",
+      "zip_name": "SUOMI VIIRS C2.zip",
+      "archive_csv": "fire_archive_SV-C2_846954.csv",
+      "ignored_csvs": [
+        "fire_nrt_SV-C2_846954.csv"
+      ],
+      "statistics": {
+        "total_rows": 1291486,
+        "columns": [
+          "latitude",
+          "longitude",
+          "brightness",
+          "scan",
+          "track",
+          "acq_date",
+          "acq_time",
+          "satellite",
+          "instrument",
+          "confidence",
+          "version",
+          "bright_t31",
+          "frp",
+          "daynight",
+          "type"
+        ],
+        "n_columns": 15,
+        "missing_required_columns": [],
+        "unexpected_columns": [],
+        "missing_values_by_column": {
+          "latitude": 0,
+          "longitude": 0,
+          "brightness": 0,
+          "scan": 0,
+          "track": 0,
+          "acq_date": 0,
+          "acq_time": 0,
+          "satellite": 0,
+          "instrument": 0,
+          "confidence": 0,
+          "version": 0,
+          "bright_t31": 0,
+          "frp": 0,
+          "daynight": 0,
+          "type": 0
+        },
+        "missing_values": 0,
+        "exact_duplicates": 0,
+        "unparseable_dates": 0,
+        "first_date": "2012-01-20",
+        "last_date": "2026-07-31",
+        "unparseable_times": 0,
+        "satellite_counts": {
+          "SNPP": 1291486
+        },
+        "instrument_counts": {
+          "SNPP": 1291486
+        },
+        "satellite_coverage": {
+          "SNPP": [
+            "2012-01-20",
+            "2026-07-31"
+          ]
+        },
+        "confidence_raw_counts": {
+          "h": 48694,
+          "l": 157450,
+          "n": 1085342
+        },
+        "confidence_class_counts": {
+          "nominal": 1085342,
+          "low": 157450,
+          "high": 48694
+        },
+        "confidence_unknown": 0,
+        "nominal_plus_high": 1134036,
+        "low_confidence_excluded": 157450,
+        "type_counts": {
+          "0": 1284226,
+          "2": 7182,
+          "3": 78
+        },
+        "unknown_types": [],
+        "version_counts": {
+          "2": 1291486
+        },
+        "daynight_counts": {
+          "D": 1258980,
+          "N": 32506
+        },
+        "numeric_parse_failures": {
+          "latitude": 0,
+          "longitude": 0,
+          "brightness": 0,
+          "scan": 0,
+          "track": 0,
+          "bright_t31": 0,
+          "frp": 0
+        },
+        "latitude_range": [
+          27.64404,
+          32.5503
+        ],
+        "longitude_range": [
+          73.81358,
+          77.66328
+        ],
+        "rows_outside_download_extent": 0,
+        "frp_range": [
+          0.0,
+          296.83
+        ]
+      },
+      "expectation_checks": [
+        {
+          "check": "total_rows",
+          "expected": 1291486,
+          "actual": 1291486,
+          "match": true
+        },
+        {
+          "check": "first_date",
+          "expected": "2012-01-20",
+          "actual": "2012-01-20",
+          "match": true
+        },
+        {
+          "check": "last_date",
+          "expected": "2026-07-31",
+          "actual": "2026-07-31",
+          "match": true
+        },
+        {
+          "check": "n_columns",
+          "expected": 15,
+          "actual": 15,
+          "match": true
+        },
+        {
+          "check": "exact_duplicates",
+          "expected": 0,
+          "actual": 0,
+          "match": true
+        },
+        {
+          "check": "missing_values",
+          "expected": 0,
+          "actual": 0,
+          "match": true
+        },
+        {
+          "check": "confidence_class_counts",
+          "expected": {
+            "low": 157450,
+            "nominal": 1085342,
+            "high": 48694
+          },
+          "actual": {
+            "nominal": 1085342,
+            "low": 157450,
+            "high": 48694
+          },
+          "match": true
+        },
+        {
+          "check": "nominal_plus_high",
+          "expected": 1134036,
+          "actual": 1134036,
+          "match": true
+        },
+        {
+          "check": "type_counts",
+          "expected": {
+            "0": 1284226,
+            "2": 7182,
+            "3": 78
+          },
+          "actual": {
+            "0": 1284226,
+            "2": 7182,
+            "3": 78
+          },
+          "match": true
+        }
+      ],
+      "all_expectations_met": true,
+      "warnings": [],
+      "zip_members": {
+        "archive": [
+          "fire_archive_SV-C2_846954.csv"
+        ],
+        "ignored_nrt": [
+          "fire_nrt_SV-C2_846954.csv"
+        ],
+        "other": [
+          "Readme.txt"
+        ]
+      }
+    }
+  },
+  "warnings": [
+    "MODIS: 'confidence_class_counts' expected {'low': 13685, 'nominal': 374592, 'high': 67595} but found {'nominal': 380300, 'high': 61887, 'low': 13685}"
+  ]
+}
