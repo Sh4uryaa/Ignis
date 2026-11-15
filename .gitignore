@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+
+# Raw NASA archives and extracted CSVs (keep locally, never commit)
+data/raw/
+data/extracted/
+*.zip
+
+# Large processed geodata
+data/processed/*.parquet
+# ...except the compact map data, so a fresh clone has a working map (~25 MB).
+!data/processed/map_detections.parquet
+
+# Streamlit / OS / editor
+.streamlit/secrets.toml
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Temporary exports
+exports/
+*.tmp
