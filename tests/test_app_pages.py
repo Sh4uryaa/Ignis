@@ -12,7 +12,7 @@ from processing.build_outputs import OUTPUT_FILES
 PAGES = ["overview", "historical_map", "harmonization", "activity_calendar",
          "anomaly_analysis", "methodology"]
 HAS_DATA = (PROCESSED_DIR / OUTPUT_FILES["harmonized_monthly"]).exists() and \
-           (PROCESSED_DIR / OUTPUT_FILES["detections"]).exists()
+           (PROCESSED_DIR / OUTPUT_FILES["map_detections"]).exists()
 
 
 def _page_script(page: str, region: str) -> None:
