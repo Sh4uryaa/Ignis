@@ -1,6 +1,6 @@
 """IGNIS — Streamlit entry point.
 
-Only configures the app, loads global styles, initialises state and
+Only configures the app, loads global styles, draws the shared top bar and
 dispatches to the selected page. All data processing lives in
 ``processing/``; page layouts live in ``pages/``.
 
@@ -8,9 +8,9 @@ Run:  streamlit run app.py
 """
 import streamlit as st
 
-from config.settings import APP_NAME, APP_TAGLINE
-from components.navigation import build_navigation, render_sidebar
+from components.navigation import build_navigation, render_top_bar
 from components.styles import load_global_styles
+from config.settings import APP_NAME, APP_TAGLINE
 from pages import (
     activity_calendar,
     anomaly_analysis,
@@ -20,7 +20,8 @@ from pages import (
     overview,
 )
 
-st.set_page_config(page_title=f"{APP_NAME} — {APP_TAGLINE}", page_icon="🔥", layout="wide")
+st.set_page_config(page_title=f"{APP_NAME} — {APP_TAGLINE}", page_icon="🔥", layout="wide",
+                   initial_sidebar_state="collapsed")
 load_global_styles()
 
 navigation = build_navigation([
@@ -31,5 +32,5 @@ navigation = build_navigation([
     (anomaly_analysis.render, "Anomaly Analysis", ":material/insights:", "anomalies"),
     (methodology.render, "Methodology & Data Quality", ":material/science:", "methodology"),
 ])
-render_sidebar()
+render_top_bar(navigation)
 navigation.run()

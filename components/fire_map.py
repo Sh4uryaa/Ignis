@@ -4,7 +4,7 @@ from __future__ import annotations
 import pandas as pd
 import pydeck as pdk
 
-from config.settings import COLORS, REGIONS
+from config.settings import COLORS, FIRE_SCALE, REGIONS
 
 
 def _rgb(hex_color: str, alpha: int = 255) -> list[int]:
@@ -13,7 +13,8 @@ def _rgb(hex_color: str, alpha: int = 255) -> list[int]:
 
 
 SENSOR_RGBA = {"MODIS": _rgb(COLORS["modis"], 200), "VIIRS": _rgb(COLORS["viirs"], 190)}
-HEX_RANGE = [_rgb(c) for c in ("#7A2E0B", "#A8380C", "#D9531A", "#FF6B1A", "#FFA94D", "#FFE3A3")]
+# Density uses the same yellow -> orange -> red fire scale as the calendar.
+HEX_RANGE = [_rgb(c) for c in FIRE_SCALE]
 
 POINT_TOOLTIP = {
     "html": ("<b>{sensor} · {satellite}</b><br/>{date} {time}<br/>Lat {lat_s}, Lon {lon_s}<br/>"
@@ -74,7 +75,7 @@ def build_deck(layers: list[pdk.Layer], bounds: list[float] | None, tooltip: dic
         lon = (bounds[0] + bounds[2]) / 2
         lat = (bounds[1] + bounds[3]) / 2
         span = max(bounds[2] - bounds[0], bounds[3] - bounds[1])
-        zoom = 6.7 if span < 3.2 else 6.4  # whole state visible at ~560 px height
+        zoom = 6.5 if span < 3.2 else 6.2  # whole state visible at ~640 px height
     else:
         lon, lat, zoom = 75.8, 30.0, 6.3
     return pdk.Deck(layers=layers, map_provider="carto", map_style="dark",
@@ -87,13 +88,13 @@ def legend_html(show_modis: bool, show_viirs: bool, density: bool,
     items = []
     if density:
         rng = f" ({bins[0].split('–')[0]} → {bins[-1].split('–')[-1]} per cell)" if bins else ""
-        items.append('<span><i style="background:linear-gradient(90deg,#7A2E0B,#FF6B1A,#FFE3A3);'
+        items.append('<span><i style="background:linear-gradient(90deg,#FEF3C7,#FACC15,#F97316,#DC2626,#991B1B);'
                      f'width:48px;border-radius:2px"></i>Detections per 1 km cell, quantile colours{rng}</span>')
     else:
         if show_modis:
-            items.append(f'<span><i style="background:{COLORS["modis"]}"></i>MODIS (Terra/Aqua)</span>')
+            items.append(f'<span><i style="background:{COLORS["modis"]}"></i>MODIS (Terra + Aqua)</span>')
         if show_viirs:
             items.append(f'<span><i style="background:{COLORS["viirs"]}"></i>VIIRS Suomi-NPP</span>')
     items.append(f'<span><i class="line" style="background:{COLORS["primary"]}"></i>Selected state boundary</span>')
     items.append('<span><i class="line" style="background:#969696"></i>Other study state</span>')
-    return '<div class="ignis-legend">' + "".join(items) + "</div>"
+    return '<div class="ig-legend">' + "".join(items) + "</div>"
