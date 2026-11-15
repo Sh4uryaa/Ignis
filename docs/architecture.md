@@ -15,7 +15,8 @@ science per click.
 
 | Folder | Responsibility | Uses Streamlit? |
 |---|---|---|
-| `config/` | `settings.py`: every path, policy, period, threshold and colour | No |
+| `config/` | `settings.py`: every path, policy, period, threshold and colour token; `regions.py`: the study-region registry | No |
+| `assets/` | `styles.css` (the single stylesheet / design tokens) and `earth_hero.svg` (hero illustration) | — |
 | `processing/` | All data processing and scientific calculations | **No** |
 | `scripts/` | Command-line entry points | No |
 | `services/` | Load processed outputs (cached) and prepare page data | Loading only |
@@ -73,6 +74,8 @@ extract → inspect → standardize → coverage → confidence filter → regio
 | `validation_results.csv`, `validation_metrics.csv` | validate | Overview, Harmonization |
 | `validation_stable_orbit_cv_*.csv` | validate | Harmonization |
 | `overpass_times.csv` | diagnostics | Harmonization |
+| `calibrated_modis_monthly.csv` | harmonize (`calibrated_modis_series`) | Harmonization (four-series chart, export) |
+| `calibrated_modis_period_metrics.csv`, `calibrated_modis_yearly_metrics.csv` | validate | Harmonization (performance by period / year) |
 | `anomaly_results.csv` | calculate_anomalies | Anomalies |
 | `quality_report.json` | build_outputs | Overview, Methodology |
 | `inspection_report.json` | scripts.inspect_archives | — |
@@ -81,13 +84,22 @@ Parquet files are git-ignored; CSV/JSON outputs are small and committed.
 
 ## Website
 
-`app.py` registers six pages with `st.navigation` (so Streamlit's automatic `pages/` menu is
-not used) and renders the sidebar region selector once; its value lives in
-`st.session_state["region"]` and every page reads it via `services.region_service`.
+`app.py` registers six pages with `st.navigation(position="hidden")` and draws one shared top
+bar (`components/navigation.py`): brand, a searchable region dropdown
+(`components/region_selector.py`, options from `config/regions.py`) and a row of page links.
+The bar is in normal document flow, so it scrolls away; there is no sidebar. The selected region
+lives in `st.session_state["region"]` and every page reads it via `services.region_service`.
+
+**Adding a region:** append a `Region` to `config/regions.py`, add its boundary file, re-run the
+pipeline. The dropdown, pages and pipeline pick it up without UI changes.
+
+Overview-specific components: `hero.py` (landing hero), `historical_trend.py` (three-line
+MODIS / VIIRS / harmonized chart) and `sensor_coverage.py` (two-row MODIS / VIIRS timeline).
+`activity_heatmap.py` draws the GitHub-style fire calendar (quantile bins per region).
 
 | Page | Services | Components |
 |---|---|---|
-| `overview.py` | data, analytics | metric_cards, comparison_charts, summary_charts |
+| `overview.py` | data, analytics | hero, metric_cards, historical_trend, sensor_coverage, summary_charts |
 | `historical_map.py` | data, region, analytics | filters, fire_map, metric_cards |
 | `harmonization.py` | data, analytics | comparison_charts, calibration_charts, data_export |
 | `activity_calendar.py` | data, analytics | activity_heatmap, filters, data_export |
@@ -106,5 +118,10 @@ boundary files show an error and no map (a rectangle is never substituted).
 
 - Streamlit does not hot-reload edited modules under `pages/`; restart `streamlit run app.py`
   after editing a page.
-- Colour identity: MODIS orange `#FF6B1A`, VIIRS amber `#F5C542`; MODIS-derived estimates are
-  also dashed so identity never relies on colour alone.
+- Colour identity (tokens in `config/settings.py` and `assets/styles.css`): MODIS gold `#FACC15`,
+  VIIRS orange `#F97316`, harmonized teal `#2DD4BF`; estimated harmonized values are also dashed.
+  Activity magnitude uses the fire scale yellow → orange → red (`FIRE_SCALE`).
+- `st.html` strips inline `<svg>`, so the hero globe is embedded as an image data URI; its glow
+  animation lives inside the SVG and respects `prefers-reduced-motion`.
+- The active nav link is marked by wrapping it in a keyed container (`ignis_nav_active`), since
+  Streamlit exposes no stable active-link attribute.

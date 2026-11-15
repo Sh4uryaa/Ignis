@@ -41,10 +41,17 @@ from processing.build_outputs import (
     write_table,
 )
 from processing.calculate_anomalies import calculate_anomalies
-from processing.harmonize import calibration_factors, harmonize, training_pairs
+from processing.harmonize import (
+    calibrated_modis_series,
+    calibration_factors,
+    harmonize,
+    training_pairs,
+)
 from processing.uncertainty import factor_intervals, uncertainty_intervals
 from processing.diagnostics import overpass_times
 from processing.validate import (
+    calibrated_period_metrics,
+    calibrated_yearly_metrics,
     leave_one_year_out,
     pooled_constant_factors,
     validation_metrics,
@@ -114,12 +121,17 @@ def run_harmonization(totals: pd.DataFrame) -> dict:
     cv_metrics = validation_metrics(cv_rows, period=(str(cv_first), str(cv_last)),
                                     validation_type="supplementary_stable_orbit_loyo_cv")
     anomalies = calculate_anomalies(harmonized)
+    calibrated = calibrated_modis_series(totals, factors)   # same training factors
+    cal_periods = calibrated_period_metrics(calibrated)
+    cal_years = calibrated_yearly_metrics(calibrated)
 
     for key, df in [("training_pairs", pairs), ("calibration_factors", factors),
                     ("harmonized_monthly", harmonized), ("uncertainty_intervals", unc),
                     ("validation_results", val_rows), ("validation_metrics", metrics),
                     ("validation_cv_results", cv_rows), ("validation_cv_metrics", cv_metrics),
-                    ("anomaly_results", anomalies)]:
+                    ("anomaly_results", anomalies), ("calibrated_modis", calibrated),
+                    ("calibrated_period_metrics", cal_periods),
+                    ("calibrated_yearly_metrics", cal_years)]:
         write_table(df, key)
     for _, f in factors[factors["validation_status"] != "available"].iterrows():
         logger.warning("No calibration factor: %s month %s — %s",
@@ -133,7 +145,11 @@ def run_harmonization(totals: pd.DataFrame) -> dict:
     print(f"\nSupplementary stable-orbit leave-one-year-out CV ({cv_first}-{cv_last}):")
     print(cv_metrics[["region", "comparison", "n_months", "wape_pct",
                       "relative_bias_pct"]].round(1).to_string(index=False))
-    return harmonization_summary(factors, harmonized, metrics, unc, cv_metrics)
+    print("\nCalibrated MODIS vs VIIRS by period:")
+    print(cal_periods[["region", "comparison_period", "n_months", "wape_pct",
+                       "relative_bias_pct"]].round(1).to_string(index=False))
+    return harmonization_summary(factors, harmonized, metrics, unc, cv_metrics,
+                                 cal_periods, cal_years)
 
 
 def main() -> int:

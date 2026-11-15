@@ -20,7 +20,7 @@ from components.fire_map import (
 )
 from components.metric_cards import metric_row, note
 from components.navigation import data_unavailable, page_header
-from config.settings import CONFIDENCE_POLICY_LABEL, MAP_MAX_POINTS, REGIONS
+from config.settings import MAP_MAX_POINTS, REGIONS
 from services import analytics_service as A
 from services.data_service import DataUnavailable, load_detections
 from services.region_service import boundary_geojson, missing_boundaries, region_bounds, selected_region
@@ -39,7 +39,7 @@ def _default_window(hi: dt.date) -> tuple[dt.date, dt.date]:
 def render() -> None:
     region = selected_region()
     page_header("Historical Fire Map", "Hotspot detections inside the actual state boundary.",
-                region, [CONFIDENCE_POLICY_LABEL])
+                region)
     if missing_boundaries():
         st.error("State boundary files are missing: " + ", ".join(missing_boundaries()) +
                  ". Run `python -m scripts.prepare_boundaries`. A rectangle is never substituted.")
@@ -78,7 +78,7 @@ def render() -> None:
 
     by_sensor = sub["sensor"].astype(str).value_counts()
     metric_row([
-        {"label": "Detections in selection", "value": fmt_int(n), "accent": True,
+        {"label": "Detections in selection", "value": fmt_int(n),
          "sub": f"{start:%d %b %Y} – {end:%d %b %Y}"},
         {"label": "MODIS", "value": fmt_int(by_sensor.get("MODIS", 0)), "sub": "Terra + Aqua"},
         {"label": "VIIRS S-NPP", "value": fmt_int(by_sensor.get("VIIRS", 0)), "sub": "375 m"},
@@ -110,7 +110,7 @@ def render() -> None:
                  f"(every {k}th in time order) for speed. All totals on this page use the full "
                  "record — sampling never changes reported counts.")
 
-    st.pydeck_chart(build_deck(layers, region_bounds(region), tooltip), height=560)
+    st.pydeck_chart(build_deck(layers, region_bounds(region), tooltip), height=640)
     st.html(legend_html("VIIRS" != sensor[:5], "VIIRS" in sensor or sensor == "All sensors",
                         density and n > 0, bins))
     if density and n:

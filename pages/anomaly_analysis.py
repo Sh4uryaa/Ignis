@@ -51,7 +51,7 @@ def render() -> None:
             {"label": "Difference", "value": fmt_int(r["anomaly_abs"]) if r["anomaly_abs"] < 0
              else "+" + fmt_int(r["anomaly_abs"]), "sub": fmt_signed_pct(r["anomaly_pct"])},
             {"label": "Assessment", "value": r["anomaly_label"].replace(" historical median", ""),
-             "sub": r["anomaly_label"], "accent": True},
+             "sub": r["anomaly_label"]},
         ])
         st.write("")
         est_share = int(r["baseline_estimated_years"])

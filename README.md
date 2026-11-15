@@ -40,12 +40,13 @@ lets users explore the result.
 |---|---|
 | **Overview** | Coverage, MODIS and VIIRS totals, harmonized record, trend, seasonality, detection types, calibration status |
 | **Historical Fire Map** | PyDeck map within real state boundaries; date, sensor and detection-type filters; tooltips; 1 km-grid density or individual points |
-| **Harmonization & Comparison** | Raw sensor comparison, harmonized series with uncertainty band, Terra/Aqua breakdown, monthly calibration factors, validation, orbit-drift diagnostics |
+| **Harmonization & Comparison** | Raw sensor comparison; four-series chart (raw MODIS, actual VIIRS, calibrated MODIS, final harmonized record) with uncertainty band; Terra/Aqua breakdown; monthly calibration factors; validation with error by year and overpass-time diagnostics |
 | **Burning Activity Calendar** | Month × year heatmap of harmonized activity with status for every month; click a month for details or to open it on the map |
 | **Anomaly Analysis** | Each month vs. the median of the same calendar month in other years |
 | **Methodology & Data Quality** | Data sources, pipeline, formulas, uncertainty, quality report, limitations, all CSV downloads |
 
-A persistent sidebar selector switches every page and export between Punjab and Haryana.
+A top navigation bar links all six pages, and a searchable **Study region** dropdown switches
+every page and export between Punjab and Haryana (regions come from `config/regions.py`).
 
 | | |
 |---|---|
@@ -119,12 +120,25 @@ months per state). WAPE = total absolute error / total VIIRS:
 | Single constant factor (baseline) | 44.5% | 32.9% |
 
 Calibration clearly improves comparability, but held-out accuracy is limited, and in this period
-the seasonal factors did not beat a single constant factor. The cause is visible in the data:
-**Terra and Aqua drifted off their original overpass times after 2022** (Aqua ~13:45 → ~15:07 IST
-by 2025; Terra ~11:20 → ~10:06 IST), while Suomi-NPP stayed at ~13:40. In the stable-orbit years
-the method performs well — a supplementary leave-one-year-out check over 2012–2021 gives
-**12.5% (Punjab) and 11.3% (Haryana)** WAPE with near-zero bias, and seasonal factors beat the
-constant factor. That check re-uses training-period data and does not replace the independent
+the seasonal factors did not beat a single constant factor.
+
+**Calibrated MODIS series.** The same formula, `MODIS × r(region, month)`, is also applied to every
+complete MODIS month as a separate comparison series (`calibrated_modis_monthly.csv`), using the
+training factors unchanged. It is in-sample for Feb 2012 – Dec 2022 and out-of-sample for
+Jan 2023 – Jul 2026; the final harmonized record still uses actual VIIRS wherever it exists.
+
+| Calibrated MODIS vs VIIRS (WAPE) | Punjab | Haryana |
+|---|---|---|
+| Training years, in-sample (each year) | 10.5% (6.9–15.8%) | 10.3% (3.8–15.4%) |
+| Held-out 2023 – Jul 2026, out-of-sample | 49.1% | 34.0% |
+
+**Does performance change after 2022?** Yes — error is within ~16% in every training year,
+including 2022, and rises from 2023. This coincides with Terra and Aqua drifting off their original
+overpass times (Aqua ~13:45 → ~15:07 IST by 2025; Terra ~11:20 → ~10:06 IST; Suomi-NPP steady at
+~13:40) and with changes in burning itself (e.g. Punjab's falling stubble-burning detections). The
+data show *when* agreement changes but cannot attribute it to one cause, and MODIS detections remain
+valid observations. A supplementary leave-one-year-out check over 2012–2021 gives **12.5% (Punjab)
+and 11.3% (Haryana)** WAPE; it re-uses training-period data and does not replace the independent
 hold-out. The 2002–2011 backcast period has MODIS overpass times matching the training years.
 
 ## Uncertainty
@@ -216,7 +230,8 @@ command instead of failing.
 - VIIRS is a reference instrument, not ground truth.
 - Two MODIS satellites are compared with one VIIRS satellite, so the factors also absorb
   differences in observation opportunities.
-- Terra/Aqua orbit drift after 2022 reduces MODIS–VIIRS comparability in recent years.
+- Terra/Aqua overpass times changed after 2021 and calibrated MODIS agrees less well with VIIRS
+  from 2023; the drift is a possible contributor that IGNIS evaluates rather than assumes.
 - Uncertainty bands cover only the calibration factor.
 - Missing observations are never interpreted as zero fire activity.
 - Anomalies describe unusual satellite-detected activity, not emergencies.
