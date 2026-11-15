@@ -19,10 +19,7 @@ from utils.formatters import fmt_int, fmt_pct, month_label
 
 def render() -> None:
     region = selected_region()
-<<<<<<< HEAD
 
-=======
->>>>>>> 398ae2ebb76ff5f8e2778bebf4e4de063c8316c0
     try:
         totals = load_table("monthly_region_totals")
         h = load_table("harmonized_monthly")
@@ -38,17 +35,11 @@ def render() -> None:
     cov = A.coverage_timeline(report)
     all_detections = (totals[["modis_terra_count", "modis_aqua_count", "viirs_snpp_count"]]
                       .sum().sum())
-<<<<<<< HEAD
     render_hero(
         meta=f"{fmt_int(all_detections)} satellite detections · "
              f"{cov['start'].min():%Y}–{cov['end'].max():%Y} · "
              f"{len(totals['region'].unique())} study regions",
     )
-=======
-    render_hero(meta=f"{fmt_int(all_detections)} satellite detections · "
-                     f"{cov['start'].min():%Y}–{cov['end'].max():%Y} · "
-                     f"{len(totals['region'].unique())} study regions")
->>>>>>> 398ae2ebb76ff5f8e2778bebf4e4de063c8316c0
 
     hr = A.with_date(A.for_region(h, region))
     rec = A.harmonized_record_summary(hr)
