@@ -59,9 +59,16 @@ def _read_detections(path: str, mtime: float) -> pd.DataFrame:
 
 
 def load_detections() -> pd.DataFrame:
-    """All retained detections (shared, read-only — never mutate the result)."""
-    require("detections")
-    p = _path("detections")
+    """All retained detections for the map (shared, read-only — never mutate).
+
+    Reads the compact, git-committed ``map_detections.parquet`` so a fresh
+    clone works without re-running the pipeline; falls back to the full local
+    ``detections.parquet`` if only that exists.
+    """
+    key = "map_detections" if _path("map_detections").exists() else "detections"
+    if not _path(key).exists():
+        raise DataUnavailable([_path("map_detections")])
+    p = _path(key)
     return _read_detections(str(p), p.stat().st_mtime)
 
 

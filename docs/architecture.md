@@ -61,7 +61,8 @@ extract → inspect → standardize → coverage → confidence filter → regio
 
 | File | Produced by | Used by pages |
 |---|---|---|
-| `detections.parquet` | aggregate (retained, in-state detections) | Map |
+| `detections.parquet` | aggregate (retained, in-state detections; local only) | Map fallback |
+| `map_detections.parquet` | build_outputs (same rows, map columns only, zstd; **committed**) | Map |
 | `grid_monthly.parquet` | aggregate | (available for grid analyses) |
 | `monthly_sensor_counts.csv` | aggregate | Methodology downloads |
 | `monthly_region_totals.csv` | aggregate | Overview, Harmonization |
@@ -80,7 +81,9 @@ extract → inspect → standardize → coverage → confidence filter → regio
 | `quality_report.json` | build_outputs | Overview, Methodology |
 | `inspection_report.json` | scripts.inspect_archives | — |
 
-Parquet files are git-ignored; CSV/JSON outputs are small and committed.
+CSV/JSON outputs are small and committed. Parquet files are git-ignored except
+`map_detections.parquet` (~25 MB), which is committed so a fresh clone has a working map
+without the NASA archives.
 
 ## Website
 

@@ -37,6 +37,7 @@ from processing.build_outputs import (
     build_quality_report,
     harmonization_summary,
     read_table,
+    write_map_detections,
     write_quality_report,
     write_table,
 )
@@ -201,6 +202,7 @@ def main() -> int:
 
     # Step 8: aggregations.
     write_table(in_region[DETECTION_COLUMNS], "detections")
+    write_map_detections(in_region)   # compact, committed copy for the map
     write_table(coverage, "sensor_coverage")
     write_table(monthly_sensor_counts(in_region), "monthly_sensor_counts")
     totals = monthly_region_totals(in_region, coverage)
