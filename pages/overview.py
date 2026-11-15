@@ -4,7 +4,7 @@ from __future__ import annotations
 import streamlit as st
 
 from components.hero import STATS_ANCHOR, render_hero
-from components.historical_trend import historical_trend_chart
+from components.historical_trend import availability_notes, monthly_activity_chart
 from components.metric_cards import metric_row, note, section_title
 from components.navigation import data_unavailable
 from components.sensor_coverage import sensor_coverage_chart
@@ -39,7 +39,6 @@ def render() -> None:
                      f"{len(totals['region'].unique())} study regions")
 
     hr = A.with_date(A.for_region(h, region))
-    t = A.with_date(A.for_region(totals, region))
     rec = A.harmonized_record_summary(hr)
     sens = A.sensor_totals(totals, region)
     latest = A.latest_complete_common_month(totals, region)
@@ -67,16 +66,7 @@ def render() -> None:
          "tag": "VIIRS observed" if latest_row else ""},
     ])
 
-    section_title("Historical Monthly Hotspot Activity",
-                  "Comparing raw MODIS, raw VIIRS and the harmonized historical record.")
-    st.plotly_chart(historical_trend_chart(t, hr), width="stretch", config=PLOTLY_CONFIG)
-    note("MODIS (1 km) misses many small fires that VIIRS (375 m) detects, so the raw lines sit on "
-         "different scales. The <b>harmonized record</b> puts the whole history on the VIIRS scale: "
-         "before 2012 it is an <b>estimate</b> (MODIS × seasonal calibration factor); from the "
-         "VIIRS reference period onward it <b>equals the VIIRS observation</b>, which is why the "
-         "cyan and orange lines overlap there. Only complete months are drawn; the MODIS line starts "
-         "with the first full month of combined Terra + Aqua. Counts are satellite detections, not "
-         "unique fires.")
+    _monthly_activity(totals, h, region)
 
     section_title("Sensor coverage")
     st.plotly_chart(sensor_coverage_chart(cov), width="stretch", config=PLOTLY_CONFIG)
@@ -94,6 +84,32 @@ def render() -> None:
                         config=PLOTLY_CONFIG)
 
     _calibration_summary(factors, metrics, region)
+
+
+def _monthly_activity(totals, harmonized, region: str) -> None:
+    """Monthly Fire Activity: one selected year, January–December, three series."""
+    section_title("Monthly Fire Activity",
+                  "Compare MODIS, VIIRS and harmonized hotspot detections throughout the year.")
+    years = sorted((int(y) for y in totals.loc[totals["region"] == region, "year"].unique()),
+                   reverse=True)
+    default = A.latest_complete_year(totals, region) or years[0]
+    st.session_state.setdefault("overview_year", default)
+    if st.session_state["overview_year"] not in years:
+        st.session_state["overview_year"] = default
+    year = st.selectbox("Year", years, key="overview_year", width=160,
+                        help="Defaults to the latest year with complete MODIS and VIIRS months.")
+    frame = A.year_monthly_activity(totals, harmonized, region, int(year))
+    st.plotly_chart(monthly_activity_chart(frame, region_label(region), int(year)),
+                    width="stretch", config=PLOTLY_CONFIG)
+    gaps = availability_notes(frame, int(year))
+    if gaps:
+        st.caption(" ".join(gaps))
+    note("MODIS (1 km) misses many small fires that VIIRS (375 m) detects, so the raw lines sit on "
+         "different scales. The <b>harmonized record</b> puts every year on the VIIRS scale: before "
+         "2012 it is an <b>estimate</b> (MODIS × seasonal calibration factor); from the VIIRS "
+         "reference period onward it <b>equals the actual VIIRS observation</b>, so the teal and "
+         "orange lines overlap. Counts are satellite detections, not unique fires. The full "
+         "multi-year comparison is on Harmonization & Comparison.")
 
 
 def _calibration_summary(factors, metrics, region: str) -> None:
@@ -114,5 +130,6 @@ def _calibration_summary(factors, metrics, region: str) -> None:
                              f" → {m.loc['calibrated_seasonal', 'validation_end']}",
                       "tag": "Improves on raw" if cal < raw else "No improvement"})
     metric_row(cards)
-    st.caption("Held-out accuracy is reduced by Terra/Aqua orbit drift after 2022 — details on "
+    st.caption("Held-out error is higher than in the training years. When it changes, and the "
+               "possible role of Terra/Aqua overpass-time drift, is examined on "
                "Harmonization & Comparison.")

@@ -5,7 +5,7 @@ Bins are quantiles of the selected region's monthly values (one scale for
 all years, so years are comparable); hover always shows the actual count.
 
 Months that are not on the harmonized scale are never coloured as zero:
-unavailable months are dark grey, partial months mid-grey with a slash.
+unavailable months are dark grey, partial months a lighter neutral grey.
 Estimated (MODIS-based) months carry a small dot.
 """
 from __future__ import annotations
@@ -136,10 +136,6 @@ def calendar_heatmap(frame: pd.DataFrame) -> tuple[go.Figure, list[tuple[str, st
         yy, mm = np.where(mask)
         return [months[i] for i in mm], [years[i] for i in yy]
 
-    px, py = cells(partial_cells)
-    fig.add_trace(go.Scatter(x=px, y=py, mode="markers", hoverinfo="skip", showlegend=False,
-                             marker={"symbol": "line-ne", "size": 12,
-                                     "line": {"width": 1.5, "color": "#9AA3B2"}}))
     ex, ey = cells(estimated)
     fig.add_trace(go.Scatter(x=ex, y=ey, mode="markers", hoverinfo="skip", showlegend=False,
                              marker={"symbol": "circle", "size": 4, "color": "rgba(255,255,255,0.9)",
@@ -176,17 +172,25 @@ def calendar_heatmap(frame: pd.DataFrame) -> tuple[go.Figure, list[tuple[str, st
 
 
 def calendar_legend_html(entries: list[tuple[str, str]]) -> str:
-    """Compact 'Less … More' legend with bin ranges, plus status swatches."""
-    sq = "".join(
-        f'<span title="{escape(label)} detections" style="display:inline-flex;flex-direction:column;'
-        f'align-items:center;gap:3px;font-size:10px;color:#9AA3B2">'
-        f'<i style="display:block;width:16px;height:16px;border-radius:3px;background:{c}"></i>'
-        f'{escape(label)}</span>' for c, label in entries)
+    """Compact 'Less … More' legend with bin ranges, plus status swatches.
+
+    A grid keeps 'Less', the colour squares and 'More' on one row at any
+    column width; range labels sit on a second row under their squares.
+    """
+    n = len(entries)
+    muted = "font-size:11px;color:#9AA3B2"
+    squares = "".join(
+        f'<i title="{escape(label)} detections" style="justify-self:center;width:16px;height:16px;'
+        f'border-radius:3px;background:{c}"></i>' for c, label in entries)
+    labels = "".join(
+        f'<span style="justify-self:center;font-size:9px;color:#9AA3B2;white-space:nowrap">'
+        f'{escape(label)}</span>' for _, label in entries)
+    grid = (f'<div style="display:grid;grid-template-columns:auto repeat({n}, minmax(0, 1fr)) auto;'
+            f'align-items:center;column-gap:4px;row-gap:3px;max-width:400px;margin-top:4px">'
+            f'<span style="{muted}">Less</span>{squares}<span style="{muted}">More</span>'
+            f'<span></span>{labels}<span></span></div>')
     status = (f'<span><i class="sq" style="background:{COLORS["missing"]}"></i>Not available</span>'
               f'<span><i class="sq" style="background:{COLORS["partial"]}"></i>Partial month</span>'
               '<span><i style="background:#fff;width:6px;height:6px;border:1px solid #000;'
               'vertical-align:1px"></i>Estimated from MODIS</span>')
-    return ('<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-top:4px">'
-            '<span style="font-size:11px;color:#9AA3B2;padding-top:2px">Less</span>'
-            f'{sq}<span style="font-size:11px;color:#9AA3B2;padding-top:2px">More</span></div>'
-            f'<div class="ig-legend">{status}</div>')
+    return f'{grid}<div class="ig-legend">{status}</div>'

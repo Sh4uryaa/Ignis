@@ -16,6 +16,7 @@ EXPORT_NAMES: dict[str, str] = {
     "validation": "validation_results",
     "anomalies": "anomaly_results",
     "detection_types": "detection_type_breakdown",
+    "calibrated": "calibrated_modis_comparison",
 }
 
 

@@ -31,6 +31,9 @@ OUTPUT_FILES: dict[str, str] = {
     "validation_cv_results": "validation_stable_orbit_cv_results.csv",
     "validation_cv_metrics": "validation_stable_orbit_cv_metrics.csv",
     "overpass_times": "overpass_times.csv",
+    "calibrated_modis": "calibrated_modis_monthly.csv",
+    "calibrated_period_metrics": "calibrated_modis_period_metrics.csv",
+    "calibrated_yearly_metrics": "calibrated_modis_yearly_metrics.csv",
 }
 
 
@@ -44,7 +47,9 @@ def read_table(key: str, base: Path = S.PROCESSED_DIR) -> pd.DataFrame:
 
 def harmonization_summary(factors: pd.DataFrame, harmonized: pd.DataFrame,
                           metrics: pd.DataFrame, intervals: pd.DataFrame,
-                          cv_metrics: pd.DataFrame | None = None) -> dict[str, Any]:
+                          cv_metrics: pd.DataFrame | None = None,
+                          calibrated_periods: pd.DataFrame | None = None,
+                          calibrated_years: pd.DataFrame | None = None) -> dict[str, Any]:
     """Settings and headline results of Phase 5 for the quality report."""
     unavailable = factors[factors["validation_status"] != "available"]
     return {
@@ -75,6 +80,14 @@ def harmonization_summary(factors: pd.DataFrame, harmonized: pd.DataFrame,
                      "overpass times were stable. Not an independent hold-out and does "
                      "not replace the primary validation."),
             "metrics": [] if cv_metrics is None else cv_metrics.to_dict("records"),
+        },
+        "calibrated_modis_comparison": {
+            "formula": "Calibrated_MODIS = MODIS_combined x r(region, calendar month)",
+            "note": ("Comparison series only; the final harmonized record uses actual VIIRS "
+                     "once available. Training rows are in-sample, validation rows "
+                     "out-of-sample. Factors are never refitted on validation data."),
+            "by_period": [] if calibrated_periods is None else calibrated_periods.to_dict("records"),
+            "by_year": [] if calibrated_years is None else calibrated_years.to_dict("records"),
         },
     }
 

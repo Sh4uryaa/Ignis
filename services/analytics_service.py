@@ -191,3 +191,80 @@ def grid_cell_counts(df: pd.DataFrame) -> pd.DataFrame:
                                                  lat=("cell_lat", "first"),
                                                  count=("cell_id", "size"))
     return g.reset_index(drop=True)
+
+
+# ---------------------------------------------------------------------------
+# Overview: one year, January–December
+# ---------------------------------------------------------------------------
+_COVERAGE_TEXT = {"complete": "complete month", "partial": "partial month",
+                  "none": "not observing", "terra_only": "Terra only — no combined MODIS",
+                  "aqua_only": "Aqua only — no combined MODIS"}
+
+
+def latest_complete_year(totals: pd.DataFrame, region: str) -> int | None:
+    """Latest year in which MODIS combined and VIIRS are complete in all 12 months."""
+    t = totals[(totals["region"] == region) & (totals["modis_combined_coverage"] == "complete")
+               & (totals["viirs_snpp_coverage"] == "complete")]
+    full = t.groupby("year")["month"].nunique()
+    full = full[full == 12]
+    return int(full.index.max()) if not full.empty else None
+
+
+_PERIOD_TEXT = {
+    "historical_backcast": "before VIIRS (this is the harmonized estimate)",
+    "training_in_sample": "training year — in-sample",
+    "validation_out_of_sample": "held-out year — out-of-sample",
+    "not_a_comparison_month": "no complete VIIRS month to compare",
+}
+
+
+def year_monthly_activity(totals: pd.DataFrame, harmonized: pd.DataFrame, region: str,
+                          year: int, calibrated: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Twelve rows (Jan–Dec) of processed counts and statuses for one region-year.
+
+    Values are copied from the processed tables unchanged. A sensor that did
+    not observe a month gives NaN (never 0); partial months keep their real
+    count and are flagged; months outside the record are labelled as such.
+    Also returns Terra and Aqua separately and, if ``calibrated`` (the
+    calibrated_modis_monthly table) is given, calibrated MODIS.
+    """
+    months = pd.DataFrame({"month": range(1, 13)})
+    t = totals[(totals["region"] == region) & (totals["year"] == year)]
+    h = harmonized[(harmonized["region"] == region) & (harmonized["year"] == year)]
+    f = months.merge(t, on="month", how="left").merge(
+        h[["month", "harmonized_activity", "source_flag"]], on="month", how="left")
+    in_record = f["modis_combined_coverage"].notna()
+
+    out = pd.DataFrame({"month": f["month"], "month_name": [
+        pd.Timestamp(2000, m, 1).strftime("%B") for m in f["month"]]})
+    out["modis"] = f["modis_combined_count"].astype(float)
+    out["modis_status"] = np.where(
+        in_record, f["modis_combined_coverage"].map(_COVERAGE_TEXT).fillna("not observing"),
+        "outside the satellite record")
+    out["viirs"] = f["viirs_snpp_count"].astype(float)
+    out["viirs_status"] = np.where(
+        in_record, f["viirs_snpp_coverage"].map(_COVERAGE_TEXT).fillna("not observing"),
+        "outside the satellite record")
+    usable = f["source_flag"].isin([FLAG_ESTIMATED, FLAG_VIIRS])
+    out["harmonized"] = f["harmonized_activity"].astype(float).where(usable)
+    out["harmonized_status"] = np.select(
+        [f["source_flag"] == FLAG_ESTIMATED, f["source_flag"] == FLAG_VIIRS, in_record],
+        ["estimated (MODIS × calibration factor)", "observed (= actual VIIRS)",
+         f["source_flag"].map(STATUS_SHORT).fillna("not harmonized").str.lower()],
+        default="outside the satellite record")
+    out["harmonized_completeness"] = np.where(usable, "complete month",
+                                              np.where(in_record, "not on the harmonized scale",
+                                                       "outside the satellite record"))
+    for key, count, cov in (("terra", "modis_terra_count", "modis_terra_coverage"),
+                            ("aqua", "modis_aqua_count", "modis_aqua_coverage")):
+        out[key] = f[count].astype(float)
+        out[f"{key}_status"] = np.where(
+            in_record, f[cov].map(_COVERAGE_TEXT).fillna("not observing"),
+            "outside the satellite record")
+    if calibrated is not None:
+        c = calibrated[(calibrated["region"] == region) & (calibrated["year"] == year)]
+        c = months.merge(c[["month", "calibrated_modis", "comparison_period"]], on="month", how="left")
+        out["calibrated"] = c["calibrated_modis"].astype(float)
+        out["calibrated_status"] = c["comparison_period"].map(_PERIOD_TEXT).fillna(
+            "no calibrated value (incomplete MODIS month or no factor)")
+    return out
