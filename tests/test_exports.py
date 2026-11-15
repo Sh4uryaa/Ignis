@@ -44,6 +44,10 @@ REQUIRED_COLUMNS = {
                            "calibrated_error", "calibration_factor"},
     "detection_type_breakdown": {"region", "sensor", "satellite", "detection_type",
                                  "detection_type_label", "confidence_policy", "detection_count"},
+    "calibrated_modis": {"region", "year", "month", "modis_combined_count", "viirs_snpp_count",
+                         "calibration_factor", "calibrated_modis", "comparison_period",
+                         "is_complete_overlap", "absolute_error", "relative_error_pct",
+                         "confidence_policy"},
     "anomaly_results": {"region", "year", "month", "harmonized_activity", "historical_median",
                         "anomaly_abs", "anomaly_pct", "anomaly_label", "source_flag"},
 }

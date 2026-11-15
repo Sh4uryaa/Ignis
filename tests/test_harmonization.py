@@ -100,3 +100,41 @@ def test_no_extrapolation_after_viirs_ends():
     row = h[(h.region == "Punjab") & (h.year == 2013) & (h.month == 12)].iloc[0]
     assert row.source_flag == "modis_only_after_reference"
     assert np.isnan(row.harmonized_activity) and row.is_partial_month
+
+
+def test_calibrated_modis_series_formula_and_periods():
+    from processing.harmonize import (PERIOD_BACKCAST, PERIOD_OTHER, PERIOD_TRAINING,
+                                      PERIOD_VALIDATION, calibrated_modis_series)
+    t = make_totals(years=range(2010, 2027))
+    f = calibration_factors(training_pairs(t))
+    s = calibrated_modis_series(t, f).set_index(["region", "year", "month"])
+    row = s.loc[("Punjab", 2015, 5)]
+    assert row.calibrated_modis == pytest.approx(row.modis_combined_count * 5.0)   # M × r_m
+    assert s.loc[("Punjab", 2011, 3), "comparison_period"] == PERIOD_BACKCAST
+    assert s.loc[("Punjab", 2012, 1), "comparison_period"] == PERIOD_OTHER          # partial VIIRS
+    assert s.loc[("Punjab", 2022, 12), "comparison_period"] == PERIOD_TRAINING
+    assert s.loc[("Punjab", 2023, 1), "comparison_period"] == PERIOD_VALIDATION
+    assert np.isnan(s.loc[("Punjab", 2011, 3), "absolute_error"])                    # no VIIRS to compare
+
+
+def test_calibrated_series_matches_harmonized_backcast_and_leaves_record_unchanged():
+    from processing.harmonize import calibrated_modis_series
+    t = make_totals(years=range(2010, 2027))
+    f = calibration_factors(training_pairs(t))
+    h = harmonize(t, f)
+    s = calibrated_modis_series(t, f)
+    est = h[h.source_flag == FLAG_ESTIMATED].merge(s, on=["region", "year", "month"])
+    assert len(est) > 0 and (est.harmonized_activity == est.calibrated_modis).all()
+    ref = h[h.source_flag == FLAG_VIIRS]
+    assert (ref.harmonized_activity == ref.viirs_snpp_count).all()                   # still actual VIIRS
+
+
+def test_calibrated_series_never_refits_on_validation_data():
+    from processing.harmonize import calibrated_modis_series
+    t = make_totals(years=range(2010, 2027))
+    f = calibration_factors(training_pairs(t))
+    t2 = t.copy()
+    t2.loc[t2.year >= 2023, "viirs_snpp_count"] *= 10      # change only held-out VIIRS
+    s1, s2 = calibrated_modis_series(t, f), calibrated_modis_series(t2, f)
+    pd.testing.assert_series_equal(s1.calibrated_modis, s2.calibrated_modis)
+    assert calibration_factors(training_pairs(t2)).equals(f)

@@ -3,17 +3,18 @@ from __future__ import annotations
 
 import streamlit as st
 
-from components import filters
 from components.calibration_charts import (
     factor_chart,
     overpass_chart,
     ratio_strip,
     validation_timeseries,
     validation_wape_chart,
+    yearly_error_chart,
 )
-from components.comparison_charts import harmonized_chart, platform_chart, raw_sensor_chart
+from components.comparison_charts import four_series_chart, platform_chart, raw_sensor_chart
+from components.historical_trend import availability_notes, monthly_series_chart
 from components.data_export import download_csv
-from components.metric_cards import metric_row, note
+from components.metric_cards import metric_row, note, section_title
 from components.navigation import data_unavailable, page_header
 from config.settings import (
     MIN_MONTHLY_DETECTIONS,
@@ -27,6 +28,7 @@ from config.settings import (
 )
 from services import analytics_service as A
 from services.data_service import DataUnavailable, load_table
+from config.regions import region_label
 from services.region_service import selected_region
 from utils.charts import PLOTLY_CONFIG
 from utils.formatters import fmt_int, fmt_pct, fmt_signed_pct
@@ -48,36 +50,88 @@ def render() -> None:
         metrics = load_table("validation_metrics")
         cv = load_table("validation_cv_metrics")
         overpass = load_table("overpass_times")
+        calibrated = load_table("calibrated_modis")
+        cal_periods = load_table("calibrated_period_metrics")
+        cal_years = load_table("calibrated_yearly_metrics")
     except DataUnavailable as exc:
         data_unavailable(exc)
         return
 
-    lo, hi = int(h["year"].min()), int(h["year"].max())
-    years = filters.year_range("Years shown", lo, hi, key="harm_years")
-    t = A.with_date(A.between_years(A.for_region(totals, region), *years))
-    hr = A.with_date(A.between_years(A.calendar_frame(A.for_region(h, region), unc), *years))
+    # One year, January–December (same style as the Overview chart).
+    year_options = sorted((int(y) for y in totals.loc[totals["region"] == region, "year"].unique()),
+                          reverse=True)
+    default_year = A.latest_complete_year(totals, region) or year_options[0]
+    st.session_state.setdefault("harm_year", default_year)
+    if st.session_state["harm_year"] not in year_options:
+        st.session_state["harm_year"] = default_year
+    year = int(st.selectbox("Year", year_options, key="harm_year", width=160,
+                            help="Month-by-month view of one year. The full multi-year timeline "
+                                 "is in the expander under each chart."))
+    frame = A.year_monthly_activity(totals, h, region, year, calibrated)
+    label = region_label(region)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Sensor comparison", "Harmonized series",
+    # Full-record frames for the multi-year expanders and the downloads.
+    t = A.with_date(A.for_region(totals, region))
+    hr = A.with_date(A.calendar_frame(A.for_region(h, region), unc))
+    cal = A.with_date(A.for_region(calibrated, region))
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Sensor comparison", "Calibrated & harmonized series",
                                       "Calibration factors", "Validation"])
     with tab1:
-        note("Combined MODIS (Terra + Aqua) and VIIRS S-NPP raw monthly counts. Only months each "
-             "sensor observed completely are drawn; partial months are left as gaps, never zeros.")
-        st.plotly_chart(raw_sensor_chart(t), width="stretch", config=PLOTLY_CONFIG)
-        st.plotly_chart(platform_chart(t), width="stretch", config=PLOTLY_CONFIG)
-        st.caption("Before July 2002 only Terra was observing; those months are Terra-only and are "
-                   "never treated as combined MODIS.")
+        section_title(f"Raw monthly detections by sensor — {year}",
+                      "Combined MODIS (Terra + Aqua) and VIIRS Suomi-NPP, January to December.")
+        st.plotly_chart(monthly_series_chart(frame, label, year, ["modis", "viirs"]),
+                        width="stretch", config=PLOTLY_CONFIG)
+        section_title(f"How the combined MODIS count is built — {year}",
+                      "Combined MODIS (gold) is the sum of Terra (blue) and Aqua (pink); "
+                      "Terra and Aqua are drawn on top so they stay visible where one dominates.")
+        st.plotly_chart(monthly_series_chart(frame, label, year, ["modis", "terra", "aqua"],
+                                             height=340), width="stretch", config=PLOTLY_CONFIG)
+        notes = availability_notes(frame, year, ("modis", "terra", "aqua", "viirs"))
+        if notes:
+            st.caption(" ".join(notes))
+        note("Raw counts are not on a common scale: VIIRS (375 m) detects many small fires that "
+             "MODIS (1 km) misses. Months a sensor did not observe are gaps, never zeros; partial "
+             "months keep their real count with a hollow marker. Before July 2002 only Terra was "
+             "observing, so there is no combined MODIS value for those months.")
+        with st.expander("Full timeline, 2000–2026"):
+            st.plotly_chart(raw_sensor_chart(t), width="stretch", config=PLOTLY_CONFIG)
+            st.plotly_chart(platform_chart(t), width="stretch", config=PLOTLY_CONFIG)
 
     with tab2:
-        st.plotly_chart(harmonized_chart(hr, height=460), width="stretch", config=PLOTLY_CONFIG)
-        note("<b>Dashed + shaded</b>: estimated VIIRS-equivalent activity = combined MODIS × the "
-             "month's calibration factor. The band is the <b>95% bootstrap calibration-factor "
-             "uncertainty interval</b> — it reflects uncertainty in the factor only, not satellite "
-             "measurement error, cloud omission or fire variability. <b>Solid</b>: direct VIIRS "
-             "observations; the calibration band does not apply there, though VIIRS observations "
-             "still carry their own observational uncertainty. × marks months that are not on the "
-             "harmonized scale (Terra-only or partial). No smoothing is applied at the transition.")
-        download_csv(hr.drop(columns=["date", "status", "status_long"]), region, "harmonized",
-                     "Harmonized monthly activity (CSV)", years)
+        section_title(f"Calibrated and harmonized activity — {year}",
+                      "Raw MODIS, actual VIIRS, calibrated MODIS and the final harmonized record.")
+        st.plotly_chart(monthly_series_chart(frame, label, year,
+                                             ["modis", "viirs", "calibrated", "harmonized"]),
+                        width="stretch", config=PLOTLY_CONFIG)
+        statuses = frame["calibrated_status"].dropna().unique().tolist()
+        notes = availability_notes(frame, year, ("modis", "viirs", "calibrated", "harmonized"))
+        st.caption(f"{year}: calibrated MODIS is "
+                   + "; ".join(sorted(set(statuses))) + ". " + " ".join(notes))
+        note("<b>The calibrated MODIS line shows what the model predicts on the VIIRS reference "
+             "scale. The final harmonized line uses actual VIIRS observations once they become "
+             "available.</b> Calibrated MODIS = combined Terra + Aqua × that calendar month's factor "
+             f"(fitted on {TRAINING_START} → {TRAINING_END} only). Before VIIRS it <i>is</i> the "
+             "harmonized estimate, so the teal and purple lines coincide; from the VIIRS reference "
+             "period the harmonized line equals actual VIIRS, so teal and orange coincide. "
+             f"{TRAINING_START[:4]}–{TRAINING_END[:4]} are training years (in-sample); "
+             f"{VALIDATION_START[:4]}–{VALIDATION_END[:4]} are held out (out-of-sample).")
+        with st.expander("Full timeline, 2002–2026, with the calibration-uncertainty band"):
+            periods = {"training": (TRAINING_START, TRAINING_END),
+                       "validation": (VALIDATION_START, VALIDATION_END)}
+            st.plotly_chart(four_series_chart(t, cal, hr, periods), width="stretch",
+                            config=PLOTLY_CONFIG)
+            st.caption("Lightly shaded years are in-sample, darker shaded years are held out. The "
+                       "teal band is the 95% bootstrap calibration-factor uncertainty interval on "
+                       "pre-2012 estimates only — factor uncertainty, not measurement error, cloud "
+                       "omission or fire variability.")
+        c1, c2 = st.columns(2)
+        with c1:
+            download_csv(cal.drop(columns=["date"]), region, "calibrated",
+                         "Calibrated MODIS comparison (CSV)")
+        with c2:
+            download_csv(hr.drop(columns=["date", "status", "status_long"]), region, "harmonized",
+                         "Final harmonized record (CSV)")
 
     with tab3:
         note(f"For each calendar month: ratio = VIIRS ÷ combined MODIS in every complete training "
@@ -106,10 +160,10 @@ def render() -> None:
                      "Calibration factors (CSV)")
 
     with tab4:
-        _validation(region, val, metrics, cv, overpass)
+        _validation(region, val, metrics, cv, overpass, cal_periods, cal_years)
 
 
-def _validation(region, val, metrics, cv, overpass) -> None:
+def _validation(region, val, metrics, cv, overpass, cal_periods, cal_years) -> None:
     m = metrics[metrics["region"] == region]
     if m.empty or m["n_months"].max() == 0:
         st.warning("Not enough complete validation months to evaluate the calibration.")
@@ -117,10 +171,12 @@ def _validation(region, val, metrics, cv, overpass) -> None:
     mi = m.set_index("comparison")
     raw, cal = mi.loc["raw_modis"], mi.loc["calibrated_seasonal"]
     improved = cal["wape_pct"] < raw["wape_pct"]
+    section_title("Calibrated MODIS vs actual VIIRS — held-out months",
+                  f"{VALIDATION_START} → {VALIDATION_END}: factors were never fitted on these months.")
     metric_row([
         {"label": "Held-out months", "value": fmt_int(cal["n_months"]),
-         "sub": f"{VALIDATION_START} → {VALIDATION_END}, complete overlap"},
-        {"label": "WAPE raw → calibrated", "accent": True,
+         "sub": "Complete overlapping months"},
+        {"label": "WAPE (raw MODIS → calibrated)",
          "value": f"{fmt_pct(raw['wape_pct'])} → {fmt_pct(cal['wape_pct'])}",
          "sub": "Improves on raw MODIS" if improved else "Does NOT improve on raw MODIS"},
         {"label": "Relative bias (calibrated)", "value": fmt_signed_pct(cal["relative_bias_pct"], 1),
@@ -138,6 +194,17 @@ def _validation(region, val, metrics, cv, overpass) -> None:
         v = A.with_date(A.for_region(val, region))
         st.plotly_chart(validation_timeseries(v), width="stretch", config=PLOTLY_CONFIG)
 
+    with st.expander("Month-by-month held-out comparison"):
+        table = A.for_region(val, region)[[
+            "year", "month", "actual_viirs_count", "predicted_viirs_equivalent",
+            "calibrated_absolute_error", "calibrated_relative_error_pct", "calibration_factor"]]
+        st.dataframe(table.rename(columns={
+            "actual_viirs_count": "Actual VIIRS", "predicted_viirs_equivalent": "Calibrated MODIS",
+            "calibrated_absolute_error": "Absolute error",
+            "calibrated_relative_error_pct": "Relative error (%)",
+            "calibration_factor": "Factor"}).round(1), hide_index=True, width="stretch")
+        st.caption("Relative error is blank when actual VIIRS is 0 (undefined).")
+
     const = mi.loc["constant_factor"] if "constant_factor" in mi.index else None
     msg = (f"Calibration reduces the gap to VIIRS from {fmt_pct(raw['wape_pct'])} to "
            f"{fmt_pct(cal['wape_pct'])} WAPE in held-out months." if improved else
@@ -145,23 +212,45 @@ def _validation(region, val, metrics, cv, overpass) -> None:
     if const is not None and const["wape_pct"] <= cal["wape_pct"]:
         msg += (f" In this period a single constant factor did slightly better "
                 f"({fmt_pct(const['wape_pct'])}), so seasonality did not add value here.")
-    note(msg + " Held-out accuracy is limited by MODIS orbit drift: after 2022 Terra and Aqua "
-         "observe at different times of day than during training (chart below), which changes the "
-         "MODIS/VIIRS ratio. This affects the validation years, not the 2002–2011 backcast, when "
-         "MODIS overpass times matched the training period.")
+    note(msg)
 
-    st.markdown("##### Diagnostics")
+    section_title("Does performance change after 2022?",
+                  "Calibrated MODIS error against actual VIIRS, every year with complete overlap.")
+    p = cal_periods[cal_periods["region"] == region].set_index("comparison_period")
+    y = cal_years[cal_years["region"] == region].sort_values("year")
     d1, d2 = st.columns([3, 2])
     with d1:
-        st.plotly_chart(overpass_chart(overpass), width="stretch", config=PLOTLY_CONFIG)
+        st.plotly_chart(yearly_error_chart(cal_years, region), width="stretch", config=PLOTLY_CONFIG)
     with d2:
+        st.plotly_chart(overpass_chart(overpass), width="stretch", config=PLOTLY_CONFIG)
+    if {"training_in_sample", "validation_out_of_sample"} <= set(p.index):
+        tr, va = p.loc["training_in_sample"], p.loc["validation_out_of_sample"]
+        pre = y[y["comparison_period"] == "training_in_sample"]["wape_pct"]
+        note(f"In the training years ({tr['first_month']} → {tr['last_month']}) calibrated MODIS is "
+             f"within <b>{fmt_pct(tr['wape_pct'])}</b> WAPE of VIIRS overall (yearly "
+             f"{fmt_pct(pre.min())}–{fmt_pct(pre.max())}) — but these years are <b>in-sample</b>, "
+             f"so this is a fit, not a test. In the held-out years ({va['first_month']} → "
+             f"{va['last_month']}) WAPE is <b>{fmt_pct(va['wape_pct'])}</b> with bias "
+             f"{fmt_signed_pct(va['relative_bias_pct'], 1)}. The change coincides with Terra and "
+             "Aqua drifting to different overpass times (right), which alters which part of the "
+             "daily fire cycle MODIS samples; it also coincides with changes in burning itself "
+             "(e.g. the decline in Punjab's stubble-burning detections). The data show <i>when</i> "
+             "performance changes but cannot attribute it to a single cause, and MODIS "
+             "observations remain valid detections. 2026 covers January–July only.")
+    d3, d4 = st.columns([3, 2])
+    with d3:
+        st.markdown("##### Calibrated MODIS vs VIIRS by period")
+        st.dataframe(p.reset_index()[["comparison_period", "first_month", "last_month", "n_months",
+                                      "mae", "rmse", "wape_pct", "relative_bias_pct"]].round(1),
+                     hide_index=True, width="stretch")
+        st.caption("Leave-one-year-out (right) refits the factors without each year in turn — a "
+                   "fairer in-period check than the in-sample fit, but still supplementary to the "
+                   "independent hold-out.")
+    with d4:
         cvm = cv[cv["region"] == region]
         st.plotly_chart(validation_wape_chart(
-            cvm, f"Supplementary: stable-orbit CV {STABLE_ORBIT_CV_YEARS[0]}–{STABLE_ORBIT_CV_YEARS[1]}"),
+            cvm, f"Supplementary: leave-one-year-out {STABLE_ORBIT_CV_YEARS[0]}–{STABLE_ORBIT_CV_YEARS[1]}"),
             width="stretch", config=PLOTLY_CONFIG)
-        st.caption("Leave-one-year-out within training years while MODIS orbits were stable. "
-                   "Supplementary only — it re-uses training-period data and does not replace "
-                   "the independent hold-out above.")
     download_csv(A.for_region(val, region), region, "validation", "Validation results (CSV)")
     with st.expander("All validation metrics"):
         st.dataframe(m, hide_index=True, width="stretch")

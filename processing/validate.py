@@ -35,6 +35,9 @@ def validation_months(totals: pd.DataFrame, factors: pd.DataFrame,
     out["predicted_viirs_equivalent"] = out["modis_combined_count"] * out["calibration_factor"]
     out["raw_error"] = out["modis_combined_count"] - out["actual_viirs_count"]
     out["calibrated_error"] = out["predicted_viirs_equivalent"] - out["actual_viirs_count"]
+    out["calibrated_absolute_error"] = out["calibrated_error"].abs()
+    actual_pos = out["actual_viirs_count"].where(out["actual_viirs_count"] > 0)
+    out["calibrated_relative_error_pct"] = out["calibrated_error"] / actual_pos * 100
     if constant_factors:
         out["constant_factor"] = out["region"].map(constant_factors)
         out["constant_factor_prediction"] = out["modis_combined_count"] * out["constant_factor"]
@@ -138,3 +141,43 @@ def leave_one_year_out(pairs: pd.DataFrame, first_year: int, last_year: int,
         rows["held_out_year"] = y
         out.append(rows)
     return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
+def _calibrated_metrics(rows: pd.DataFrame) -> dict[str, float]:
+    return error_metrics(rows["viirs_snpp_count"].astype(float),
+                         rows["calibrated_modis"].astype(float))
+
+
+def calibrated_period_metrics(series: pd.DataFrame) -> pd.DataFrame:
+    """Calibrated MODIS vs VIIRS, per region, for training vs validation months.
+
+    Training rows are in-sample (the factors were fitted on them); validation
+    rows are out-of-sample. Only complete overlapping months are used.
+    """
+    from processing.harmonize import PERIOD_TRAINING, PERIOD_VALIDATION
+    s = series[series["comparison_period"].isin([PERIOD_TRAINING, PERIOD_VALIDATION])]
+    records = []
+    for (region, period), g in s.groupby(["region", "comparison_period"], sort=False):
+        records.append({"region": region, "comparison_period": period,
+                        "first_month": f"{int(g.year.iloc[0])}-{int(g.month.iloc[0]):02d}",
+                        "last_month": f"{int(g.year.iloc[-1])}-{int(g.month.iloc[-1]):02d}",
+                        **_calibrated_metrics(g)})
+    return pd.DataFrame(records)
+
+
+def calibrated_yearly_metrics(series: pd.DataFrame) -> pd.DataFrame:
+    """Calibrated MODIS vs VIIRS error per region and year (complete overlap only).
+
+    Lets users see *when* performance changes (e.g. around the Terra/Aqua
+    overpass-time drift after 2021) instead of assuming a cause.
+    """
+    from processing.harmonize import PERIOD_TRAINING, PERIOD_VALIDATION
+    s = series[series["comparison_period"].isin([PERIOD_TRAINING, PERIOD_VALIDATION])]
+    records = []
+    for (region, year), g in s.groupby(["region", "year"], sort=True):
+        records.append({"region": region, "year": int(year),
+                        "comparison_period": g["comparison_period"].iloc[0],
+                        "viirs_total": float(g["viirs_snpp_count"].sum()),
+                        "calibrated_modis_total": float(g["calibrated_modis"].sum()),
+                        **_calibrated_metrics(g)})
+    return pd.DataFrame(records)

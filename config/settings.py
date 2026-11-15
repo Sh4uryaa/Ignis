@@ -9,6 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from config.regions import REGION_REGISTRY
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -177,15 +179,13 @@ VIIRS_PLATFORM_LABEL: str = "Suomi-NPP"
 # ---------------------------------------------------------------------------
 # Study regions and geography
 # ---------------------------------------------------------------------------
-REGIONS: tuple[str, ...] = ("Punjab", "Haryana")
-DEFAULT_REGION: str = "Punjab"
+# Derived from the region registry (config/regions.py) — edit regions there.
+REGIONS: tuple[str, ...] = tuple(r.key for r in REGION_REGISTRY)
+DEFAULT_REGION: str = REGIONS[0]
 OUTSIDE_REGION_LABEL: str = "Outside study area"
-REGION_BOUNDARY_FILES: dict[str, Path] = {
-    "Punjab": GEO_DIR / "punjab.geojson",
-    "Haryana": GEO_DIR / "haryana.geojson",
-}
+REGION_BOUNDARY_FILES: dict[str, Path] = {r.key: r.boundary_file for r in REGION_REGISTRY}
 # ISO 3166-2 codes used to select each state from the source dataset.
-REGION_ISO_CODES: dict[str, str] = {"Punjab": "IN-PB", "Haryana": "IN-HR"}
+REGION_ISO_CODES: dict[str, str] = {r.key: r.iso_code for r in REGION_REGISTRY}
 BOUNDARY_PROVENANCE_PATH: Path = GEO_DIR / "boundary_provenance.json"
 BOUNDARY_SOURCE: dict[str, str] = {
     "name": "geoBoundaries gbOpen, India ADM1 (State / Union Territory)",
@@ -260,20 +260,32 @@ ANOMALY_NEAR_BAND_PCT: float = 20.0
 APP_NAME: str = "IGNIS"
 APP_TAGLINE: str = "Harmonizing Satellite Fire Observations Across Time."
 APP_SUBTITLE: str = "NASA MODIS–VIIRS Historical Fire Analysis"
+APP_HEADLINE: str = "See the patterns. Understand the fire."
+APP_DESCRIPTION: str = ("A harmonized historical view of satellite fire detections, helping "
+                        "uncover burning patterns across Punjab and Haryana.")
 
+# Colour tokens. Sensor colours are identity colours and are used the same
+# way on every page: MODIS gold, VIIRS orange, harmonized teal.
 COLORS: dict[str, str] = {
-    "background": "#0F1115",
-    "surface": "#171A21",
-    "border": "#2A2F3A",
-    "primary": "#FF6B1A",     # bright orange
-    "secondary": "#E0A458",   # muted amber
-    "text": "#FFFFFF",
-    "text_muted": "#A8AEB8",
-    "modis": "#FF6B1A",
-    "terra": "#FF8C42",
-    "aqua": "#C2410C",
-    "viirs": "#F5C542",
+    "background": "#0B0D11",
+    "surface": "#14171D",
+    "surface_raised": "#1A1E26",
+    "border": "#262B35",
+    "primary": "#F97316",     # brand orange (accent, active states)
+    "secondary": "#FBBF24",   # amber
+    "text": "#F8FAFC",
+    "text_muted": "#9AA3B2",
+    "modis": "#FACC15",       # MODIS Terra + Aqua (gold)
+    "terra": "#60A5FA",       # Terra — blue (platform detail; distinct from combined gold)
+    "aqua": "#F472B6",        # Aqua — pink (platform detail; distinct from combined gold)
+    "viirs": "#F97316",       # VIIRS Suomi-NPP (orange)
+    "harmonized": "#2DD4BF",  # harmonized record (teal)
+    "calibrated": "#A78BFA",  # calibrated MODIS = MODIS x factor (purple)
     "positive": "#4CAF7A",
     "negative": "#E5484D",
+    "missing": "#2A2F3A",     # unavailable / not harmonized
+    "partial": "#4B5263",     # partial-coverage month
 }
+# Sequential fire scale for activity magnitude: yellow -> orange -> red.
+FIRE_SCALE: tuple[str, ...] = ("#FEF3C7", "#FACC15", "#FB923C", "#F97316", "#DC2626", "#991B1B")
 MAP_MAX_POINTS: int = 20_000

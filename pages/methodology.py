@@ -114,10 +114,20 @@ def _calibration(report: dict) -> None:
              r"\text{Bias} = \frac{\sum_i (\hat V_i - V_i)}{\sum_i V_i}\times 100")
     st.markdown("plus MAE and RMSE. Raw MODIS-vs-VIIRS error is reported alongside, so the effect "
                 "of calibration is visible — including if it does not help.")
-    note("Known issue: from 2022 Terra and Aqua drift from their original overpass times, which "
-         "lowers accuracy in the 2023–2026 hold-out. A supplementary leave-one-year-out check over "
-         f"{S.STABLE_ORBIT_CV_YEARS[0]}–{S.STABLE_ORBIT_CV_YEARS[1]} (stable orbits) is shown on the "
-         "Harmonization page; it does not replace the independent hold-out.")
+    st.markdown("**Calibrated MODIS comparison series** — the same formula applied to every "
+                "complete combined-MODIS month, using the training factors unchanged:")
+    st.latex(r"\text{Calibrated\_MODIS}_{y,m} = M_{y,m} \times r_m")
+    st.markdown(f"Before VIIRS this *is* the harmonized estimate. From {S.TRAINING_START} to "
+                f"{S.TRAINING_END} it is an in-sample comparison with VIIRS; from "
+                f"{S.VALIDATION_START} to {S.VALIDATION_END} it is an out-of-sample prediction. "
+                "It is shown alongside the final harmonized record, which keeps actual VIIRS "
+                "observations wherever they exist.")
+    note("Calibrated MODIS agrees closely with VIIRS in every training year but less well in the "
+         "2023–2026 hold-out. That change coincides with Terra and Aqua drifting to different "
+         "overpass times, and with changes in burning itself; IGNIS reports error by year so the "
+         "effect can be evaluated rather than assumed. A supplementary leave-one-year-out check over "
+         f"{S.STABLE_ORBIT_CV_YEARS[0]}–{S.STABLE_ORBIT_CV_YEARS[1]} is on the Harmonization page; it "
+         "does not replace the independent hold-out.")
 
 
 def _uncertainty() -> None:
@@ -194,7 +204,9 @@ def _limitations() -> None:
         "- VIIRS is a **reference instrument, not ground truth**.\n"
         "- Combined Terra + Aqua sampling (two satellites) differs from one VIIRS satellite's "
         "overpasses; the factor absorbs this difference too.\n"
-        "- Terra and Aqua orbits drifted after 2022, reducing comparability in recent years.\n"
+        "- Terra and Aqua overpass times changed after 2021 and calibrated MODIS agrees less well "
+        "with VIIRS from 2023; the drift is a possible contributor that is evaluated, not assumed, "
+        "and MODIS detections remain valid observations.\n"
         "- Uncertainty bands cover only the calibration factor, as described on the Uncertainty tab.\n"
         "- Missing observations are **never** interpreted as zero fire activity.\n"
         "- Anomalies describe unusual satellite-detected activity, not emergencies.")

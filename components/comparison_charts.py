@@ -87,3 +87,58 @@ def platform_chart(t: pd.DataFrame, height: int = 360) -> go.Figure:
                              line={"color": COLORS["text"], "width": 1, "dash": "dot"},
                              name="Combined (Terra + Aqua)", hovertemplate="%{y:,.0f}"))
     return style_figure(fig, "How the combined MODIS count is built", height, "Detections per month")
+
+
+def four_series_chart(t: pd.DataFrame, cal: pd.DataFrame, h: pd.DataFrame,
+                      periods: dict[str, tuple[str, str]], height: int = 500) -> go.Figure:
+    """Raw MODIS, raw VIIRS, calibrated MODIS and the final harmonized record.
+
+    ``t``: region totals with ``date``; ``cal``: calibrated MODIS series with
+    ``date``; ``h``: harmonized rows (calendar_frame) with ``date``;
+    ``periods``: {"training": (start, end), "validation": (start, end)} as
+    "YYYY-MM". Values are plotted unchanged. The harmonized line equals the
+    purple line before the VIIRS reference and the orange line after it, so
+    it is drawn last and dashed rather than offset.
+    """
+    fig = go.Figure()
+    shade = {"training": ("rgba(167,139,250,0.05)", "Training years · in-sample"),
+             "validation": ("rgba(167,139,250,0.13)", "Held-out years · out-of-sample")}
+    for name, (start, end) in periods.items():
+        fill, label = shade[name]
+        x0 = pd.Timestamp(start + "-01")
+        x1 = pd.Timestamp(end + "-01") + pd.offsets.MonthEnd(0)
+        fig.add_vrect(x0=x0, x1=x1, fillcolor=fill, line_width=0, layer="below")
+        fig.add_annotation(x=x0, y=1, yref="paper", text=label, showarrow=False, xanchor="left",
+                           yanchor="top", xshift=4, font={"color": COLORS["text_muted"], "size": 10})
+
+    fig.add_trace(line(t["date"], _complete(t["modis_combined_count"], t["modis_combined_coverage"]),
+                       "modis", name="Raw MODIS Terra + Aqua", hovertemplate="%{y:,.0f}",
+                       line={"color": COLORS["modis"], "width": 1.3}))
+    fig.add_trace(line(t["date"], _complete(t["viirs_snpp_count"], t["viirs_snpp_coverage"]),
+                       "viirs", name="Actual VIIRS Suomi-NPP", hovertemplate="%{y:,.0f}",
+                       line={"color": COLORS["viirs"], "width": 2.6}))
+    from processing.harmonize import PERIOD_DESCRIPTIONS
+    fig.add_trace(line(cal["date"], cal["calibrated_modis"], "calibrated",
+                       name="Calibrated MODIS", customdata=cal["comparison_period"].map(PERIOD_DESCRIPTIONS).to_numpy(),
+                       hovertemplate="%{y:,.0f} (%{customdata})",
+                       line={"color": COLORS["calibrated"], "width": 1.8}))
+
+    est = h["source_flag"] == FLAG_ESTIMATED
+    obs = h["source_flag"] == FLAG_VIIRS
+    b = h[est & h["lower_bound"].notna()] if "lower_bound" in h else h.iloc[0:0]
+    fig.add_trace(go.Scatter(x=b["date"], y=b["upper_bound"], mode="lines", line={"width": 0},
+                             hoverinfo="skip", showlegend=False))
+    fig.add_trace(go.Scatter(x=b["date"], y=b["lower_bound"], mode="lines", line={"width": 0},
+                             fill="tonexty", fillcolor=BAND_FILL, hoverinfo="skip",
+                             name="95% bootstrap calibration-factor interval"))
+    kind = np.where(est, "estimate = calibrated MODIS", "= actual VIIRS")
+    fig.add_trace(go.Scatter(
+        x=h["date"], y=h["harmonized_activity"].where(est | obs), mode="lines",
+        name="Final harmonized record", customdata=kind,
+        line={"color": COLORS["harmonized"], "width": 1.4, "dash": "dash"},
+        hovertemplate="%{y:,.0f} (%{customdata})"))
+    fig = style_figure(fig, None, height, "Hotspot detections per month")
+    fig.update_xaxes(type="date")
+    # Plotly reverses legends that contain filled traces; keep series order 1-4.
+    fig.update_layout(legend_traceorder="normal")
+    return fig
