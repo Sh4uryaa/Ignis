@@ -23,56 +23,33 @@
     justify-content: center;
   }
 
-  /* ── Fire backglow: warm light spilling from behind the planet ── */
+  /* ── Fire glow: a soft ring hugging the planet ──────────────────────────
+     Sized to the globe (--globe-px, set in JS) and fully transparent before
+     its own edge, so nothing is clipped by the iframe into a visible box. */
   #backglow {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: calc(var(--globe-px, 460px) * 0.98);
+    height: calc(var(--globe-px, 460px) * 0.98);
     transform: translate(-50%, -50%);
-    width: 110%;
-    height: 110%;
     border-radius: 50%;
     background: radial-gradient(
-      ellipse at center,
-      rgba(255, 90,  10, 0.42)   0%,
-      rgba(230, 55,   5, 0.28)  22%,
-      rgba(200, 40,   0, 0.14)  40%,
-      rgba(160, 30,   0, 0.06)  58%,
-      transparent               75%
+      circle closest-side,
+      rgba(249, 115, 22, 0.00)  64%,
+      rgba(249, 115, 22, 0.55)  74%,
+      rgba(234,  88, 12, 0.30)  82%,
+      rgba(220,  38, 38, 0.12)  90%,
+      rgba(220,  38, 38, 0.00) 100%
     );
-    filter: blur(28px);
     pointer-events: none;
     z-index: 0;
-    animation: pulse 5s ease-in-out infinite;
+    animation: breathe 6s ease-in-out infinite;
   }
 
-  @keyframes pulse {
-    0%   { opacity: 0.80; transform: translate(-50%, -50%) scale(1.00); }
-    50%  { opacity: 1.00; transform: translate(-50%, -50%) scale(1.06); }
-    100% { opacity: 0.80; transform: translate(-50%, -50%) scale(1.00); }
-  }
-
-  /* ── Outer ember haze: wider, softer ── */
-  #emberhaze {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 148%;
-    height: 148%;
-    border-radius: 50%;
-    background: radial-gradient(
-      ellipse at center,
-      transparent               35%,
-      rgba(180, 50,  5, 0.07)  52%,
-      rgba(140, 30,  0, 0.11)  64%,
-      rgba(100, 20,  0, 0.08)  76%,
-      transparent               88%
-    );
-    filter: blur(18px);
-    pointer-events: none;
-    z-index: 0;
-    animation: pulse 5s ease-in-out infinite reverse;
+  @keyframes breathe {
+    0%, 100% { opacity: 0.70; }
+    50%      { opacity: 1.00; }
   }
 
   /* ── Globe canvas sits above the glow layers ── */
@@ -97,14 +74,13 @@
   #no-webgl.show { display: block; }
 
   @media (prefers-reduced-motion: reduce) {
-    #backglow, #emberhaze { animation: none !important; }
+    #backglow { animation: none !important; }
   }
 </style>
 </head>
 <body>
 <div id="scene">
   <div id="backglow"></div>
-  <div id="emberhaze"></div>
   <div id="globe-mount"></div>
   <div id="no-webgl">
     <p style="font-size:3rem;">🌍</p>
@@ -155,8 +131,8 @@
     .globeImageUrl(TEX)
     .bumpImageUrl(BUMP)
     .showAtmosphere(true)
-    .atmosphereColor("#1A4FD6")          // cool blue rim
-    .atmosphereAltitude(0.14);
+    .atmosphereColor("#F97316")          // warm orange rim glow (IGNIS accent)
+    .atmosphereAltitude(0.18);
 
   // ── Camera: initial position facing India ────────────────────────────────
   globe.pointOfView({ lat: 20, lng: 80, altitude: 2.05 }, 0);
@@ -170,6 +146,7 @@
   ctrl.minDistance     = 105;
   ctrl.maxDistance     = 750;
   ctrl.enablePan       = false;         // no panning — globe stays centered
+  ctrl.enableZoom      = false;         // fixed size keeps the glow aligned; page scroll isn't trapped
 
   // OrbitControls natively pauses auto-rotation during drag (state === STATE.ROTATE)
   // and resumes when released. We add event listeners on OrbitControls and window
