@@ -45,7 +45,8 @@ lets users explore the result.
 | **Anomaly Analysis** | Each month vs. the median of the same calendar month in other years |
 | **Methodology & Data Quality** | Data sources, pipeline, formulas, uncertainty, quality report, limitations, all CSV downloads |
 
-A persistent sidebar selector switches every page and export between Punjab and Haryana.
+A top navigation bar links all six pages, and a searchable **Study region** dropdown switches
+every page and export between Punjab and Haryana (regions come from `config/regions.py`).
 
 | | |
 |---|---|

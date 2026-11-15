@@ -1,0 +1,157 @@
+/* IGNIS design system — the single stylesheet for the website.
+   Loaded once per run by components/styles.py. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+:root {
+  --ig-bg: #0B0D11;
+  --ig-surface: #14171D;
+  --ig-surface-raised: #1A1E26;
+  --ig-border: #262B35;
+  --ig-text: #F8FAFC;
+  --ig-muted: #9AA3B2;
+  --ig-faint: #6B7383;
+  --ig-orange: #F97316;
+  --ig-amber: #FBBF24;
+  --ig-gold: #FACC15;
+  --ig-cyan: #38BDF8;
+  --ig-radius: 12px;
+  --ig-radius-sm: 8px;
+  --ig-space: 1.25rem;
+  --ig-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ig-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+}
+
+/* ---------- Base ---------------------------------------------------------- */
+html, body, .stApp { background: var(--ig-bg); font-family: var(--ig-font); }
+.stApp, .stMarkdown, p, li, label { color: var(--ig-text); }
+.block-container { max-width: 1240px; padding-top: 1.1rem; padding-bottom: 4rem; }
+h1, h2, h3, h4, h5 { font-family: var(--ig-display); color: var(--ig-text); letter-spacing: -0.015em; }
+h4, h5 { font-weight: 600; }
+a { color: var(--ig-amber); }
+hr { border-color: var(--ig-border) !important; }
+
+/* Streamlit chrome: no sidebar, no fixed header (navigation lives in the page). */
+header[data-testid="stHeader"] { display: none; }
+section[data-testid="stSidebar"],
+div[data-testid="stSidebarCollapsedControl"],
+button[data-testid="stExpandSidebarButton"] { display: none !important; }
+
+/* ---------- Top bar (scrolls away with the page) -------------------------- */
+.st-key-ignis_topbar {
+  border-bottom: 1px solid var(--ig-border);
+  padding: 0.2rem 0 0.55rem;
+  margin-bottom: 0.4rem;
+  gap: 0.4rem !important;
+}
+.st-key-ignis_nav { flex-wrap: wrap; margin-left: -0.75rem; }
+.ig-brand { font-family: var(--ig-display); font-weight: 700; font-size: 1.35rem;
+  letter-spacing: 0.16em; color: var(--ig-text); line-height: 1; white-space: nowrap; }
+.ig-brand span { color: var(--ig-orange); }
+.ig-brand-sub { color: var(--ig-faint); font-size: 0.72rem; letter-spacing: 0.02em; margin-top: 0.3rem; }
+
+.st-key-ignis_nav { gap: 0.25rem !important; }
+.st-key-ignis_nav a[data-testid="stPageLink-NavLink"] {
+  padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.st-key-ignis_nav a[data-testid="stPageLink-NavLink"] p {
+  font-size: 0.86rem; font-weight: 500; color: var(--ig-muted); white-space: nowrap;
+}
+.st-key-ignis_nav a[data-testid="stPageLink-NavLink"]:hover { background: var(--ig-surface-raised); }
+.st-key-ignis_nav a[data-testid="stPageLink-NavLink"]:hover p { color: var(--ig-text); }
+/* Active page: the current link is wrapped in .st-key-ignis_nav_active (see navigation.py). */
+.st-key-ignis_nav_active a[data-testid="stPageLink-NavLink"],
+.st-key-ignis_nav_active a[data-testid="stPageLink-NavLink"]:hover {
+  background: rgba(249, 115, 22, 0.12) !important; border-color: rgba(249, 115, 22, 0.45) !important;
+}
+.st-key-ignis_nav_active a[data-testid="stPageLink-NavLink"] p { color: var(--ig-text) !important; font-weight: 600; }
+.st-key-ignis_nav a[data-testid="stPageLink-NavLink"]:focus:not(:focus-visible) { background: transparent; }
+
+.st-key-ignis_region { min-width: 230px; }
+.st-key-ignis_region label p { font-size: 0.72rem; color: var(--ig-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ---------- Page header --------------------------------------------------- */
+.ig-page-title { font-family: var(--ig-display); font-size: 2rem; font-weight: 700; margin: 0.6rem 0 0; color: var(--ig-text); }
+.ig-page-sub { color: var(--ig-muted); margin: 0.25rem 0 0.7rem; font-size: 1rem; }
+.ig-chip { display: inline-block; padding: 0.18rem 0.65rem; border-radius: 999px; font-size: 0.76rem;
+  border: 1px solid var(--ig-border); color: var(--ig-muted); margin: 0 0.35rem 0.35rem 0; }
+.ig-chip.region { border-color: rgba(249, 115, 22, 0.55); color: var(--ig-orange); font-weight: 600; }
+.ig-section-title { font-family: var(--ig-display); font-size: 1.2rem; font-weight: 600; color: var(--ig-text);
+  margin: 1.6rem 0 0.15rem; }
+.ig-section-sub { color: var(--ig-muted); font-size: 0.9rem; margin: 0 0 0.6rem; }
+.ig-eyebrow { color: var(--ig-orange); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* ---------- Cards and notes ------------------------------------------------ */
+.ig-card { background: var(--ig-surface); border: 1px solid var(--ig-border); border-radius: var(--ig-radius);
+  padding: 0.95rem 1.05rem; height: 100%; transition: border-color 0.15s ease; }
+.ig-card:hover { border-color: #353B47; }
+.ig-card .label { color: var(--ig-muted); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.07em; }
+.ig-card .value { color: var(--ig-text); font-family: var(--ig-display); font-size: 1.6rem; font-weight: 600;
+  margin-top: 0.25rem; line-height: 1.15; }
+.ig-card .sub { color: var(--ig-muted); font-size: 0.8rem; margin-top: 0.3rem; }
+.ig-card .tag { display: inline-block; margin-top: 0.4rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--ig-orange); background: rgba(249, 115, 22, 0.1); padding: 0.1rem 0.45rem; border-radius: 4px; }
+/* Card rows (components/metric_cards.metric_row): wrap below ~180px per card. */
+[class*="st-key-igcards_"] > div { flex: 1 1 180px; min-width: 180px; }
+.ig-note { background: var(--ig-surface); border: 1px solid var(--ig-border); border-radius: var(--ig-radius-sm);
+  padding: 0.7rem 0.95rem; color: var(--ig-muted); font-size: 0.88rem; line-height: 1.5; }
+.ig-note b { color: var(--ig-text); }
+.ig-legend { display: flex; flex-wrap: wrap; gap: 1rem; color: var(--ig-muted); font-size: 0.82rem; margin-top: 0.45rem; }
+.ig-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 0.35rem; vertical-align: -1px; }
+.ig-legend i.line { border-radius: 2px; height: 3px; width: 18px; vertical-align: 3px; }
+.ig-legend i.sq { border-radius: 3px; }
+
+/* Bordered Streamlit containers (filter panels) */
+div[data-testid="stVerticalBlockBorderWrapper"] { border-color: var(--ig-border) !important; border-radius: var(--ig-radius) !important; }
+
+/* Buttons */
+.stButton > button, .stDownloadButton > button, .stLinkButton > a {
+  border-radius: 999px; border: 1px solid var(--ig-border); background: var(--ig-surface);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.stButton > button:hover, .stDownloadButton > button:hover, .stLinkButton > a:hover {
+  border-color: rgba(249, 115, 22, 0.6); background: var(--ig-surface-raised); color: var(--ig-text);
+}
+
+/* Tabs: neutral underline, orange only on the active tab */
+div[data-baseweb="tab-list"] { gap: 0.4rem; border-bottom: 1px solid var(--ig-border); }
+div[data-baseweb="tab-highlight"] { background-color: var(--ig-orange); }
+div[data-baseweb="tab-border"] { display: none; }
+
+/* ---------- Hero ----------------------------------------------------------- */
+.ig-hero { display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 2rem;
+  min-height: 420px; padding: 1.5rem 0 1rem; position: relative; }
+.ig-hero-copy { position: relative; z-index: 1; }
+.ig-hero-brand { font-family: var(--ig-display); font-weight: 700; letter-spacing: 0.22em;
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem); line-height: 1; color: var(--ig-text); margin: 0.6rem 0 0; }
+.ig-hero-brand span { color: var(--ig-orange); }
+.ig-hero-headline { font-family: var(--ig-display); font-size: clamp(1.4rem, 2.4vw, 2rem); font-weight: 600;
+  color: var(--ig-text); margin: 1rem 0 0.6rem; line-height: 1.25; }
+.ig-hero-text { color: var(--ig-muted); font-size: 1.05rem; line-height: 1.6; max-width: 34rem; margin: 0 0 1.6rem; }
+.ig-hero-cta { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.75rem 1.35rem; border-radius: 999px;
+  background: var(--ig-orange); color: #140A02 !important; font-weight: 600; font-size: 0.95rem;
+  text-decoration: none !important; box-shadow: 0 6px 28px -8px rgba(249, 115, 22, 0.7);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; }
+.ig-hero-cta:hover { background: #FB8A3C; transform: translateY(-1px); box-shadow: 0 10px 34px -8px rgba(249, 115, 22, 0.85); }
+.ig-hero-meta { margin-top: 1.4rem; color: var(--ig-faint); font-size: 0.8rem; }
+.ig-hero-visual { display: flex; justify-content: center; align-items: center; position: relative; }
+/* The globe's glow animation is defined inside assets/earth_hero.svg. */
+.ig-globe { display: block; width: min(100%, 440px); height: auto; }
+
+@media (max-width: 860px) {
+  .ig-hero { grid-template-columns: 1fr; min-height: 0; gap: 0.5rem; text-align: left; }
+  .ig-hero-visual { order: -1; }
+  .ig-globe { width: min(78%, 320px); }
+}
+@media (max-width: 640px) {
+  .ig-page-title { font-size: 1.6rem; }
+  .st-key-ignis_region { min-width: 0; width: 100% !important; }
+  .st-key-ignis_nav a[data-testid="stPageLink-NavLink"] { padding: 0.2rem 0.55rem; }
+  .st-key-ignis_nav a[data-testid="stPageLink-NavLink"] p { font-size: 0.8rem; }
+}
+
+/* ---------- Motion preferences --------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

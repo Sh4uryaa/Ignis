@@ -120,7 +120,7 @@ def _validation(region, val, metrics, cv, overpass) -> None:
     metric_row([
         {"label": "Held-out months", "value": fmt_int(cal["n_months"]),
          "sub": f"{VALIDATION_START} → {VALIDATION_END}, complete overlap"},
-        {"label": "WAPE raw → calibrated", "accent": True,
+        {"label": "WAPE raw → calibrated",
          "value": f"{fmt_pct(raw['wape_pct'])} → {fmt_pct(cal['wape_pct'])}",
          "sub": "Improves on raw MODIS" if improved else "Does NOT improve on raw MODIS"},
         {"label": "Relative bias (calibrated)", "value": fmt_signed_pct(cal["relative_bias_pct"], 1),

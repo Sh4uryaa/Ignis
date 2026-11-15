@@ -1,103 +1,192 @@
-"""Month-by-year harmonized activity calendar (Plotly heatmap).
+"""GitHub-style burning-activity calendar: years × months of square cells.
 
-Harmonized months use a Viridis scale. Months that are not on the
-harmonized scale (Terra-only, partial, unavailable) are drawn as neutral
-grey cells with their status, never as zero. Estimated months carry a small
-marker so estimated and observed values are distinguishable without colour.
+Colour = harmonized monthly activity on a yellow → orange → red fire scale.
+Bins are quantiles of the selected region's monthly values (one scale for
+all years, so years are comparable); hover always shows the actual count.
+
+Months that are not on the harmonized scale are never coloured as zero:
+unavailable months are dark grey, partial months mid-grey with a slash.
+Estimated (MODIS-based) months carry a small dot.
 """
 from __future__ import annotations
+
+from html import escape
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-from config.settings import COLORS
+from config.settings import COLORS, FIRE_SCALE
 from services.analytics_service import calendar_matrix
-from utils.charts import style_figure
 from utils.dates import MONTH_NAMES
+
+CELL_PX = 26        # square cell size
+GAP_PX = 4          # gap between cells
+LEFT_PX = 46        # room for year labels
+TOP_PX = 26         # room for month labels
+
+
+def _nice(v: float) -> float:
+    """Round a threshold to 2 significant figures for readable legends."""
+    if v <= 0:
+        return 0.0
+    mag = 10 ** (np.floor(np.log10(v)) - 1)
+    return float(np.round(v / mag) * mag)
+
+
+def fire_bins(values: pd.Series | np.ndarray, n_colors: int = len(FIRE_SCALE)
+              ) -> tuple[list[float], np.ndarray]:
+    """Quantile thresholds and per-value bin index (NaN stays NaN).
+
+    Returns ``(thresholds, bins)``: ``thresholds`` are the upper edges of all
+    but the last bin (strictly increasing, rounded); ``bins`` are integers in
+    ``0 .. len(thresholds)``. Zero always falls in the lowest bin.
+    """
+    v = np.asarray(values, dtype=float)
+    finite = v[np.isfinite(v)]
+    if finite.size == 0:
+        return [], np.full(v.shape, np.nan)
+    qs = np.quantile(finite, np.linspace(0, 1, n_colors + 1)[1:-1])
+    thresholds = sorted({_nice(q) for q in qs if q > 0})
+    bins = np.where(np.isfinite(v), np.searchsorted(thresholds, v, side="left"), np.nan)
+    return thresholds, bins
+
+
+def bin_labels(thresholds: list[float]) -> list[str]:
+    edges = [0.0, *thresholds]
+    labels = [f"{edges[i]:,.0f}–{edges[i + 1]:,.0f}" for i in range(len(thresholds))]
+    labels.append(f"> {thresholds[-1]:,.0f}" if thresholds else "all")
+    return labels
+
+
+def bin_colors(n_bins: int) -> list[str]:
+    """Spread n bins over the fire scale (always ending at the deepest red)."""
+    if n_bins >= len(FIRE_SCALE):
+        return list(FIRE_SCALE)
+    idx = np.round(np.linspace(0, len(FIRE_SCALE) - 1, n_bins)).astype(int)
+    return [FIRE_SCALE[i] for i in idx]
+
+
+def completeness(row: pd.Series) -> str:
+    if row["source_flag"] in ("estimated_from_modis", "viirs_reference"):
+        return "Complete month"
+    if row["is_partial_month"]:
+        return "Partial month — not on the harmonized scale"
+    return "Not available on the harmonized scale"
 
 
 def _fmt(v, digits=0) -> str:
     return "—" if pd.isna(v) else f"{float(v):,.{digits}f}"
 
 
-def _hover_text(frame: pd.DataFrame) -> pd.DataFrame:
-    def row_text(r) -> str:
-        interval = (f"{_fmt(r['lower_bound'])}–{_fmt(r['upper_bound'])}"
-                    if pd.notna(r.get("lower_bound")) else "n/a")
-        kind = "Estimated" if r["is_estimated"] else (
-            "Observed" if r["source_flag"] == "viirs_reference" else "Not harmonized")
+def _hover(frame: pd.DataFrame) -> pd.Series:
+    def one(r) -> str:
+        kind = ("Estimated (MODIS × factor)" if r["is_estimated"] else
+                "Observed (VIIRS reference)" if r["source_flag"] == "viirs_reference" else
+                "Not harmonized")
         return (f"<b>{r['region']} · {MONTH_NAMES[int(r['month']) - 1]} {int(r['year'])}</b><br>"
                 f"Harmonized activity: <b>{_fmt(r['harmonized_activity'])}</b><br>"
-                f"MODIS Terra: {_fmt(r['modis_terra_count'])} · Aqua: {_fmt(r['modis_aqua_count'])}"
-                f" · Combined: {_fmt(r['modis_combined_count'])}<br>"
+                f"MODIS: {_fmt(r['modis_combined_count'])} "
+                f"(Terra {_fmt(r['modis_terra_count'])} · Aqua {_fmt(r['modis_aqua_count'])})<br>"
                 f"VIIRS S-NPP: {_fmt(r['viirs_snpp_count'])}<br>"
                 f"Calibration factor: {_fmt(r['calibration_factor'], 2)}<br>"
-                f"95% calibration-factor interval: {interval}<br>"
-                f"Status: {r['status']} ({kind})")
+                f"{kind}<br>{completeness(r)}")
+    return frame.apply(one, axis=1)
+
+
+def _discrete_scale(colors: list[str]) -> list[list]:
+    n = len(colors)
+    if n == 1:
+        return [[0, colors[0]], [1, colors[0]]]
+    scale = []
+    for i, c in enumerate(colors):
+        scale += [[i / n, c], [(i + 1) / n, c]]
+    return scale
+
+
+def calendar_heatmap(frame: pd.DataFrame) -> tuple[go.Figure, list[tuple[str, str]]]:
+    """Figure plus legend entries [(colour, label), ...] for ``calendar_legend_html``."""
     f = frame.copy()
-    f["hover"] = f.apply(row_text, axis=1)
-    return f
+    f["hover"] = _hover(f)
+    thresholds, bins = fire_bins(f["harmonized_activity"])
+    f["bin"] = bins
+    colors = bin_colors(len(thresholds) + 1)
 
-
-def calendar_heatmap(frame: pd.DataFrame, log_scale: bool = True, height: int | None = None
-                     ) -> go.Figure:
-    """Build the calendar figure from ``analytics_service.calendar_frame`` output."""
-    f = _hover_text(frame)
-    values = calendar_matrix(f, "harmonized_activity")
-    hover = calendar_matrix(f, "hover")
     status = calendar_matrix(f, "source_flag")
-    years = [str(y) for y in values.index]
+    years = [str(y) for y in status.index]
     months = list(MONTH_NAMES)
-
-    z = values.to_numpy(dtype=float)
-    zplot = np.log10(z + 1) if log_scale else z
-    vmax = np.nanmax(z) if np.isfinite(z).any() else 1
-    fig = go.Figure()
-    # Neutral layer for months that exist but are not on the harmonized scale.
-    not_h = (status.notna() & values.isna()).to_numpy()
-    fig.add_trace(go.Heatmap(
-        z=np.where(not_h, 1.0, np.nan), x=months, y=years,
-        colorscale=[[0, "#3A404D"], [1, "#3A404D"]], showscale=False, xgap=2, ygap=2,
-        text=hover.to_numpy(), hovertemplate="%{text}<extra></extra>", name="Not harmonized"))
-    if log_scale:
-        ticks = [v for v in [0, 10, 100, 1_000, 10_000, 100_000] if v <= vmax * 1.01]
-        colorbar = {"tickvals": np.log10(np.array(ticks) + 1), "ticktext": [f"{t:,}" for t in ticks]}
-    else:
-        colorbar = {}
-    colorbar.update({"title": {"text": "Detections", "side": "right"}, "thickness": 12,
-                     "outlinewidth": 0, "tickfont": {"color": COLORS["text_muted"]}})
-    fig.add_trace(go.Heatmap(
-        z=zplot, x=months, y=years, colorscale="Viridis", xgap=2, ygap=2,
-        zmin=0, zmax=float(np.log10(vmax + 1) if log_scale else vmax),
-        text=hover.to_numpy(), hovertemplate="%{text}<extra></extra>",
-        colorbar=colorbar, name="Harmonized activity"))
-    # Estimated-month marker (secondary encoding, not colour).
-    est = calendar_matrix(f, "is_estimated").fillna(False).astype(bool)
-    ey, em = np.where(est.to_numpy())
-    fig.add_trace(go.Scatter(
-        x=[months[i] for i in em], y=[years[i] for i in ey], mode="markers",
-        marker={"symbol": "circle-open", "size": 5, "color": "rgba(255,255,255,0.75)",
-                "line": {"width": 1}},
-        name="Estimated from MODIS", hoverinfo="skip"))
-    # Transparent clickable cells: Plotly heatmaps emit no selection events in
-    # Streamlit, scatter points do. They also carry the hover text.
     present = status.notna().to_numpy()
-    py, pm = np.where(present)
-    htext = hover.to_numpy()
+    values = calendar_matrix(f, "bin").to_numpy(dtype=float)
+    partial = calendar_matrix(f, "is_partial_month").fillna(False).astype(bool).to_numpy()
+    estimated = calendar_matrix(f, "is_estimated").fillna(False).astype(bool).to_numpy()
+    unavailable = present & np.isnan(values) & ~partial
+    partial_cells = present & np.isnan(values) & partial
+
+    fig = go.Figure()
+    common = {"x": months, "y": years, "xgap": GAP_PX, "ygap": GAP_PX, "showscale": False,
+              "hoverinfo": "skip"}
+    fig.add_trace(go.Heatmap(z=np.where(unavailable, 1.0, np.nan),
+                             colorscale=[[0, COLORS["missing"]], [1, COLORS["missing"]]], **common))
+    fig.add_trace(go.Heatmap(z=np.where(partial_cells, 1.0, np.nan),
+                             colorscale=[[0, COLORS["partial"]], [1, COLORS["partial"]]], **common))
+    fig.add_trace(go.Heatmap(z=values, zmin=-0.5, zmax=len(colors) - 0.5,
+                             colorscale=_discrete_scale(colors), **common))
+
+    def cells(mask):
+        yy, mm = np.where(mask)
+        return [months[i] for i in mm], [years[i] for i in yy]
+
+    px, py = cells(partial_cells)
+    fig.add_trace(go.Scatter(x=px, y=py, mode="markers", hoverinfo="skip", showlegend=False,
+                             marker={"symbol": "line-ne", "size": 12,
+                                     "line": {"width": 1.5, "color": "#9AA3B2"}}))
+    ex, ey = cells(estimated)
+    fig.add_trace(go.Scatter(x=ex, y=ey, mode="markers", hoverinfo="skip", showlegend=False,
+                             marker={"symbol": "circle", "size": 4, "color": "rgba(255,255,255,0.9)",
+                                     "line": {"width": 1, "color": "rgba(0,0,0,0.55)"}}))
+    # Transparent click/hover layer: heatmaps emit no selection events in Streamlit.
+    hover = calendar_matrix(f, "hover").to_numpy()
+    cx, cy = cells(present)
+    hy, hm = np.where(present)
     fig.add_trace(go.Scatter(
-        x=[months[i] for i in pm], y=[years[i] for i in py], mode="markers",
-        marker={"symbol": "square", "size": 22, "color": "rgba(0,0,0,0)"},
+        x=cx, y=cy, mode="markers", showlegend=False, name="cells",
+        marker={"symbol": "square", "size": CELL_PX, "color": "rgba(0,0,0,0)"},
         selected={"marker": {"opacity": 1}}, unselected={"marker": {"opacity": 1}},
-        text=[htext[a, b] for a, b in zip(py, pm)], hovertemplate="%{text}<extra></extra>",
-        name="cells", showlegend=False))
-    for trace in fig.data[:2]:  # hover handled by the clickable layer
-        trace.hoverinfo = "skip"
-        trace.hovertemplate = None
-    # The ○ marker is explained in the page caption; a legend would collide with top month labels.
-    fig = style_figure(fig, None, height or max(420, 22 * len(years) + 80), legend=False)
-    fig.update_layout(hovermode="closest", clickmode="event+select")
-    fig.update_yaxes(autorange="reversed", type="category", gridcolor="rgba(0,0,0,0)",
-                     rangemode="normal")
-    fig.update_xaxes(side="top", type="category")
-    return fig
+        text=[hover[a, b] for a, b in zip(hy, hm)], hovertemplate="%{text}<extra></extra>"))
+
+    step = CELL_PX + GAP_PX
+    fig.update_layout(
+        width=LEFT_PX + 12 * step + 10, height=TOP_PX + len(years) * step + 10,
+        margin={"l": LEFT_PX, "r": 10, "t": TOP_PX, "b": 10},
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font={"color": COLORS["text_muted"], "size": 11,
+              "family": "Inter, system-ui, -apple-system, Segoe UI, sans-serif"},
+        # Keep the default dragmode: in "pan" mode Plotly does not select on click.
+        # Axes are fixedrange, so users still cannot zoom.
+        hovermode="closest", clickmode="event+select", showlegend=False,
+        hoverlabel={"bgcolor": COLORS["surface"], "bordercolor": COLORS["border"],
+                    "font": {"color": COLORS["text"]}},
+    )
+    # Pin ranges to the grid so marker sizes never add padding around the cells.
+    fig.update_xaxes(side="top", type="category", showgrid=False, zeroline=False,
+                     tickfont={"size": 10}, fixedrange=True, range=[-0.5, 11.5])
+    fig.update_yaxes(type="category", showgrid=False, zeroline=False,
+                     tickfont={"size": 10}, fixedrange=True, range=[len(years) - 0.5, -0.5])
+    return fig, list(zip(colors, bin_labels(thresholds)))
+
+
+def calendar_legend_html(entries: list[tuple[str, str]]) -> str:
+    """Compact 'Less … More' legend with bin ranges, plus status swatches."""
+    sq = "".join(
+        f'<span title="{escape(label)} detections" style="display:inline-flex;flex-direction:column;'
+        f'align-items:center;gap:3px;font-size:10px;color:#9AA3B2">'
+        f'<i style="display:block;width:16px;height:16px;border-radius:3px;background:{c}"></i>'
+        f'{escape(label)}</span>' for c, label in entries)
+    status = (f'<span><i class="sq" style="background:{COLORS["missing"]}"></i>Not available</span>'
+              f'<span><i class="sq" style="background:{COLORS["partial"]}"></i>Partial month</span>'
+              '<span><i style="background:#fff;width:6px;height:6px;border:1px solid #000;'
+              'vertical-align:1px"></i>Estimated from MODIS</span>')
+    return ('<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-top:4px">'
+            '<span style="font-size:11px;color:#9AA3B2;padding-top:2px">Less</span>'
+            f'{sq}<span style="font-size:11px;color:#9AA3B2;padding-top:2px">More</span></div>'
+            f'<div class="ig-legend">{status}</div>')
