@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGNIS Globe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  #scene {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Fire backglow: warm light spilling from behind the planet ── */
+  #backglow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110%;
+    height: 110%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 90,  10, 0.42)   0%,
+      rgba(230, 55,   5, 0.28)  22%,
+      rgba(200, 40,   0, 0.14)  40%,
+      rgba(160, 30,   0, 0.06)  58%,
+      transparent               75%
+    );
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%   { opacity: 0.80; transform: translate(-50%, -50%) scale(1.00); }
+    50%  { opacity: 1.00; transform: translate(-50%, -50%) scale(1.06); }
+    100% { opacity: 0.80; transform: translate(-50%, -50%) scale(1.00); }
+  }
+
+  /* ── Outer ember haze: wider, softer ── */
+  #emberhaze {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 148%;
+    height: 148%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent               35%,
+      rgba(180, 50,  5, 0.07)  52%,
+      rgba(140, 30,  0, 0.11)  64%,
+      rgba(100, 20,  0, 0.08)  76%,
+      transparent               88%
+    );
+    filter: blur(18px);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 5s ease-in-out infinite reverse;
+  }
+
+  /* ── Globe canvas sits above the glow layers ── */
+  #globe-mount {
+    position: relative;
+    z-index: 2;
+    cursor: grab;
+  }
+  #globe-mount:active {
+    cursor: grabbing;
+  }
+
+  /* ── WebGL fallback ── */
+  #no-webgl {
+    display: none;
+    text-align: center;
+    color: #9AA3B2;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+  }
+  #no-webgl.show { display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #backglow, #emberhaze { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="scene">
+  <div id="backglow"></div>
+  <div id="emberhaze"></div>
+  <div id="globe-mount"></div>
+  <div id="no-webgl">
+    <p style="font-size:3rem;">🌍</p>
+    <p style="margin-top:.6rem;color:#9AA3B2;">Interactive globe requires WebGL.</p>
+  </div>
+</div>
+
+<!-- globe.gl v2.30.0 — pinned for stability -->
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.30.0/dist/globe.gl.min.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── WebGL guard ──────────────────────────────────────────────────────────
+  function hasWebGL() {
+    try {
+      const c = document.createElement("canvas");
+      return !!(window.WebGLRenderingContext &&
+                (c.getContext("webgl") || c.getContext("experimental-webgl")));
+    } catch (_) { return false; }
+  }
+  if (!hasWebGL()) {
+    document.getElementById("no-webgl").classList.add("show");
+    return;
+  }
+
+  // ── Responsive size ──────────────────────────────────────────────────────
+  function viewSize() {
+    const W = window.innerWidth, H = window.innerHeight;
+    const s = Math.min(W, H, 500);
+    document.documentElement.style.setProperty("--globe-px", s + "px");
+    return { W, H, s };
+  }
+  const { W: iW, H: iH } = viewSize();
+
+  // ── Globe textures (NASA Blue Marble matching existing visual) ───────────
+  const TEX  = "https://cdn.jsdelivr.net/npm/three-globe@2.31.1/example/img/earth-blue-marble.jpg";
+  const BUMP = "https://cdn.jsdelivr.net/npm/three-globe@2.31.1/example/img/earth-topology.png";
+
+  // ── Build globe ──────────────────────────────────────────────────────────
+  const mount = document.getElementById("globe-mount");
+
+  const globe = Globe({ animateIn: false })(mount)
+    .width(iW)
+    .height(iH)
+    .backgroundColor("rgba(0,0,0,0)")   // transparent — parent bg shows through
+    .globeImageUrl(TEX)
+    .bumpImageUrl(BUMP)
+    .showAtmosphere(true)
+    .atmosphereColor("#1A4FD6")          // cool blue rim
+    .atmosphereAltitude(0.14);
+
+  // ── Camera: initial position facing India ────────────────────────────────
+  globe.pointOfView({ lat: 20, lng: 80, altitude: 2.05 }, 0);
+
+  // ── Controls: continuous, visible auto-rotation ──────────────────────────
+  const ctrl = globe.controls();
+  ctrl.autoRotate      = true;
+  ctrl.autoRotateSpeed = 1.0;           // Steady, clearly perceptible rotation (60s/orbit)
+  ctrl.enableDamping   = true;
+  ctrl.dampingFactor   = 0.08;
+  ctrl.minDistance     = 105;
+  ctrl.maxDistance     = 750;
+  ctrl.enablePan       = false;         // no panning — globe stays centered
+
+  // OrbitControls natively pauses auto-rotation during drag (state === STATE.ROTATE)
+  // and resumes when released. We add event listeners on OrbitControls and window
+  // to ensure autoRotate is never stuck in false.
+  ctrl.addEventListener("end", () => {
+    ctrl.autoRotate = true;
+  });
+  window.addEventListener("pointerup", () => {
+    ctrl.autoRotate = true;
+  });
+  window.addEventListener("touchend", () => {
+    ctrl.autoRotate = true;
+  });
+
+  // ── Lighting: cinematic shading ──────────────────────────────────────────
+  globe.onGlobeReady(() => {
+    try {
+      const scene = globe.scene();
+      scene.traverse(obj => {
+        // Balanced lighting keeping the deep space aesthetic
+        if (obj.isAmbientLight)      obj.intensity = 0.55;
+        if (obj.isDirectionalLight)  obj.intensity = 1.4;
+      });
+    } catch (_) { /* non-critical */ }
+  });
+
+  // ── Responsive resize ────────────────────────────────────────────────────
+  window.addEventListener("resize", () => {
+    const { W, H } = viewSize();
+    globe.width(W).height(H);
+  });
+
+})();
+</script>
+</body>
+</html>
