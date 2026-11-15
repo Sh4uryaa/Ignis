@@ -45,18 +45,22 @@ The calibration process:
 4. Calculates monthly calibration factors using the median of year-specific VIIRS-to-MODIS ratios.
 5. Applies these factors to historical MODIS observations to estimate activity on the VIIRS reference scale.
 
+
 The calibration factor is:
 
-\[
+$$
 r_m = \operatorname{median}_y
-\left(\frac{VIIRS_{y,m}}{MODIS_{y,m}}\right)
-\]
+\left(
+\frac{VIIRS_{y,m}}{MODIS_{y,m}}
+\right)
+$$
 
 The harmonized estimate is:
 
-\[
-H_{y,m} = MODIS_{y,m}\times r_m
-\]
+$$
+H_{y,m} = MODIS_{y,m} \times r_m
+$$
+
 
 Calibration factors are trained using February 2012–December 2022 and independently evaluated against January 2023–July 2026 observations.
 
