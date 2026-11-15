@@ -165,7 +165,13 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-**1. Place the NASA archives** (not committed to git) exactly as named:
+**Just want to run the website?** All processed outputs the app needs are committed —
+including the compact map data `data/processed/map_detections.parquet` — so after cloning
+you can skip straight to step 6. After every `git pull`, re-run
+`pip install -r requirements.txt` and restart Streamlit so your packages match the code.
+
+**1. Place the NASA archives** (not committed to git; only needed to re-run the pipeline)
+exactly as named:
 
 ```
 data/raw/incoming/MODIS C6.1.zip

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 # Output file names (data/processed/).
 OUTPUT_FILES: dict[str, str] = {
     "detections": "detections.parquet",
+    "map_detections": "map_detections.parquet",
     "grid_monthly": "grid_monthly.parquet",
     "monthly_sensor_counts": "monthly_sensor_counts.csv",
     "monthly_region_totals": "monthly_region_totals.csv",
@@ -90,6 +91,32 @@ def harmonization_summary(factors: pd.DataFrame, harmonized: pd.DataFrame,
             "by_year": [] if calibrated_years is None else calibrated_years.to_dict("records"),
         },
     }
+
+
+# Columns the Historical Fire Map reads. map_detections.parquet is the one
+# processed parquet committed to git, so a fresh clone has a working map.
+MAP_COLUMNS: list[str] = [
+    "region", "sensor", "satellite", "latitude", "longitude", "acq_date", "acq_time",
+    "acq_datetime_utc", "detection_type", "detection_type_label", "confidence_raw",
+    "confidence_class", "frp", "cell_id", "cell_lat", "cell_lon",
+]
+
+
+def write_map_detections(detections: pd.DataFrame, base: Path = S.PROCESSED_DIR) -> Path:
+    """Compact copy of the retained detections for the map (values unchanged).
+
+    Same rows and values as detections.parquet, restricted to MAP_COLUMNS,
+    repeated text stored as categories and zstd-compressed (~25 MB).
+    """
+    df = detections[MAP_COLUMNS].copy()
+    for col in ("region", "sensor", "satellite", "detection_type_label",
+                "confidence_class", "confidence_raw", "acq_time"):
+        df[col] = df[col].astype(str).astype("category")
+    path = output_path("map_detections", base)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(path, index=False, compression="zstd", compression_level=19)
+    logger.info("Wrote %s (%s rows)", path.name, f"{len(df):,}")
+    return path
 
 
 def output_path(key: str, base: Path = S.PROCESSED_DIR) -> Path:
