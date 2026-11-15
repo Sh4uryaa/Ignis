@@ -62,7 +62,7 @@ def validation_wape_chart(metrics: pd.DataFrame, title: str, height: int = 300) 
     """WAPE by comparison (one measure, one axis)."""
     m = metrics.copy()
     m["label"] = m["comparison"].map(COMPARISON_LABELS)
-    colors = {"raw_modis": COLORS["modis"], "calibrated_seasonal": COLORS["harmonized"],
+    colors = {"raw_modis": COLORS["modis"], "calibrated_seasonal": COLORS["calibrated"],
               "constant_factor": COLORS["text_muted"]}
     fig = go.Figure(go.Bar(
         x=m["label"], y=m["wape_pct"], marker={"color": [colors[c] for c in m["comparison"]],
@@ -83,7 +83,7 @@ def validation_timeseries(v: pd.DataFrame, height: int = 360) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(line(v["date"], v["actual_viirs_count"], "viirs", name="Observed VIIRS",
                        hovertemplate="%{y:,.0f}", mode="lines+markers", marker={"size": 6}))
-    fig.add_trace(line(v["date"], v["predicted_viirs_equivalent"], "estimate",
+    fig.add_trace(line(v["date"], v["predicted_viirs_equivalent"], "calibrated",
                        name="Calibrated MODIS (prediction)", hovertemplate="%{y:,.0f}"))
     fig.add_trace(go.Scatter(x=v["date"], y=v["modis_combined_count"], mode="lines",
                              line={"color": COLORS["modis"], "width": 1.5, "dash": "dot"},
@@ -107,4 +107,21 @@ def overpass_chart(o: pd.DataFrame, height: int = 340) -> go.Figure:
     ticks = np.arange(9, 17.01, 1)
     fig.update_yaxes(tickvals=ticks, ticktext=[f"{int(t):02d}:00" for t in ticks],
                      rangemode="normal", range=[9, 16.5])
+    return fig
+
+
+def yearly_error_chart(y: pd.DataFrame, region: str, height: int = 320) -> go.Figure:
+    """Calibrated MODIS vs VIIRS WAPE per year: in-sample (muted) vs out-of-sample."""
+    s = y[y["region"] == region].sort_values("year")
+    held_out = s["comparison_period"] == "validation_out_of_sample"
+    colors = np.where(held_out, COLORS["calibrated"], "rgba(167,139,250,0.38)")
+    fig = go.Figure(go.Bar(
+        x=s["year"].astype(str), y=s["wape_pct"], marker={"color": colors, "cornerradius": 4},
+        customdata=np.stack([np.where(held_out, "out-of-sample", "in-sample"), s["n_months"],
+                             s["relative_bias_pct"], s["mae"]], axis=1),
+        hovertemplate=("%{x}: WAPE %{y:.1f}% (%{customdata[0]}, %{customdata[1]} months)"
+                       "<br>Bias %{customdata[2]:+.1f}% · MAE %{customdata[3]:,.0f}<extra></extra>")))
+    fig = style_figure(fig, f"{region} — calibrated MODIS error vs VIIRS, by year", height,
+                       "WAPE (%) — lower is better", legend=False)
+    fig.update_layout(hovermode="closest", bargap=0.3)
     return fig

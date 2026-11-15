@@ -27,6 +27,8 @@ from config.settings import (
     REGIONS,
     TRAINING_END,
     TRAINING_START,
+    VALIDATION_END,
+    VALIDATION_START,
 )
 from processing.coverage import COMPLETE, NONE, PARTIAL
 from utils.dates import in_period
@@ -170,3 +172,63 @@ def harmonize(totals: pd.DataFrame, factors: pd.DataFrame) -> pd.DataFrame:
             "calibration_factor", "source_flag", "is_estimated", "is_partial_month",
             "status_description", "confidence_policy"]
     return out[cols].sort_values(["region", "year", "month"]).reset_index(drop=True)
+
+
+# ---------------------------------------------------------------------------
+# Calibrated MODIS comparison series
+# ---------------------------------------------------------------------------
+PERIOD_BACKCAST = "historical_backcast"
+PERIOD_TRAINING = "training_in_sample"
+PERIOD_VALIDATION = "validation_out_of_sample"
+PERIOD_OTHER = "not_a_comparison_month"
+
+PERIOD_DESCRIPTIONS: dict[str, str] = {
+    PERIOD_BACKCAST: "Before VIIRS: calibrated MODIS is the harmonized estimate",
+    PERIOD_TRAINING: "Training years: in-sample comparison with VIIRS (factors fitted here)",
+    PERIOD_VALIDATION: "Held-out years: out-of-sample prediction of VIIRS",
+    PERIOD_OTHER: "Complete MODIS month without a complete VIIRS comparison month",
+}
+
+
+def calibrated_modis_series(totals: pd.DataFrame, factors: pd.DataFrame) -> pd.DataFrame:
+    """``Calibrated_MODIS = MODIS_combined × r_m`` for every eligible month.
+
+    Eligible: combined Terra + Aqua coverage is complete and the region-month
+    factor is available. ``factors`` are the training-period factors; nothing
+    is refitted here, so validation months stay out-of-sample.
+
+    This is a comparison series only — the final harmonized record
+    (``harmonize``) still uses actual VIIRS once it is available.
+    """
+    t = totals[totals["modis_combined_coverage"] == COMPLETE].copy()
+    f = factors.set_index(["region", "calendar_month"])["calibration_factor"]
+    t["calibration_factor"] = [f.get((r, m), np.nan) for r, m in zip(t["region"], t["month"])]
+    t = t[t["calibration_factor"].notna()]
+
+    viirs_obs = totals[totals["viirs_snpp_coverage"] != NONE]
+    first = viirs_obs.sort_values(["year", "month"]).iloc[0] if not viirs_obs.empty else None
+    first_key = int(first["year"]) * 100 + int(first["month"]) if first is not None else 10**9
+    key = t["year"].astype(int) * 100 + t["month"].astype(int)
+
+    m = t["modis_combined_count"].astype(float)
+    v = t["viirs_snpp_count"].astype(float)
+    overlap = t["viirs_snpp_coverage"] == COMPLETE
+    period = np.select(
+        [(t["viirs_snpp_coverage"] == NONE) & (key < first_key),
+         overlap & in_period(t["year"], t["month"], TRAINING_START, TRAINING_END),
+         overlap & in_period(t["year"], t["month"], VALIDATION_START, VALIDATION_END)],
+        [PERIOD_BACKCAST, PERIOD_TRAINING, PERIOD_VALIDATION], default=PERIOD_OTHER)
+
+    out = t[["region", "year", "month"]].copy()
+    out["modis_combined_count"] = m.astype("Int64")
+    out["viirs_snpp_count"] = v.where(overlap).astype("Int64")
+    out["calibration_factor"] = t["calibration_factor"]
+    out["calibrated_modis"] = m * t["calibration_factor"]
+    out["comparison_period"] = period
+    out["is_complete_overlap"] = overlap.to_numpy()
+    err = (out["calibrated_modis"] - v).where(overlap)
+    out["error"] = err
+    out["absolute_error"] = err.abs()
+    out["relative_error_pct"] = (err / v.where(v > 0) * 100)
+    out["confidence_policy"] = CONFIDENCE_POLICY_NAME
+    return out.sort_values(["region", "year", "month"]).reset_index(drop=True)

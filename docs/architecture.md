@@ -74,6 +74,8 @@ extract → inspect → standardize → coverage → confidence filter → regio
 | `validation_results.csv`, `validation_metrics.csv` | validate | Overview, Harmonization |
 | `validation_stable_orbit_cv_*.csv` | validate | Harmonization |
 | `overpass_times.csv` | diagnostics | Harmonization |
+| `calibrated_modis_monthly.csv` | harmonize (`calibrated_modis_series`) | Harmonization (four-series chart, export) |
+| `calibrated_modis_period_metrics.csv`, `calibrated_modis_yearly_metrics.csv` | validate | Harmonization (performance by period / year) |
 | `anomaly_results.csv` | calculate_anomalies | Anomalies |
 | `quality_report.json` | build_outputs | Overview, Methodology |
 | `inspection_report.json` | scripts.inspect_archives | — |
@@ -117,7 +119,7 @@ boundary files show an error and no map (a rectangle is never substituted).
 - Streamlit does not hot-reload edited modules under `pages/`; restart `streamlit run app.py`
   after editing a page.
 - Colour identity (tokens in `config/settings.py` and `assets/styles.css`): MODIS gold `#FACC15`,
-  VIIRS orange `#F97316`, harmonized cyan `#38BDF8`; estimated harmonized values are also dashed.
+  VIIRS orange `#F97316`, harmonized teal `#2DD4BF`; estimated harmonized values are also dashed.
   Activity magnitude uses the fire scale yellow → orange → red (`FIRE_SCALE`).
 - `st.html` strips inline `<svg>`, so the hero globe is embedded as an image data URI; its glow
   animation lives inside the SVG and respects `prefers-reduced-motion`.

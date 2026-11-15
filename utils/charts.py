@@ -1,7 +1,7 @@
 """Shared Plotly styling for the dark IGNIS theme.
 
 Colours follow the entity everywhere: MODIS gold, VIIRS orange, harmonized
-cyan. Estimated harmonized values are additionally dashed (observed are
+teal. Estimated harmonized values are additionally dashed (observed are
 solid) so status never relies on colour alone.
 """
 from __future__ import annotations
@@ -18,6 +18,7 @@ SERIES_STYLE = {
     "aqua": {"color": COLORS["aqua"], "name": "MODIS Aqua"},
     "modis": {"color": COLORS["modis"], "name": "MODIS combined (Terra + Aqua)"},
     "viirs": {"color": COLORS["viirs"], "name": "VIIRS Suomi-NPP"},
+    "calibrated": {"color": COLORS["calibrated"], "name": "Calibrated MODIS (MODIS × factor)"},
     "estimate": {"color": COLORS["harmonized"], "name": "Harmonized — estimated (MODIS × factor)",
                  "dash": "dash"},
     "observed": {"color": COLORS["harmonized"], "name": "Harmonized — observed (= VIIRS)",
@@ -25,7 +26,7 @@ SERIES_STYLE = {
 }
 # Restrained diverging colours for anomalies (warm above, cool below, grey near).
 DIVERGING = {"above": "#E8703A", "near": "#5B6270", "below": "#6E93B8"}
-BAND_FILL = "rgba(56,189,248,0.22)"
+BAND_FILL = "rgba(45,212,191,0.20)"
 
 
 def style_figure(fig: go.Figure, title: str | None = None, height: int = 380,
@@ -65,11 +66,12 @@ def style_figure(fig: go.Figure, title: str | None = None, height: int = 380,
 
 def line(x, y, key: str, name: str | None = None, hovertemplate: str | None = None,
          customdata=None, connectgaps: bool = False, **kw) -> go.Scatter:
-    """A 2 px line in the series' identity colour."""
+    """A 2 px line in the series' identity colour (``line=`` overrides width/dash)."""
     s = SERIES_STYLE[key]
     kw.setdefault("mode", "lines")
-    return go.Scatter(x=x, y=y, name=name or s["name"],
-                      line={"color": s["color"], "width": 2, "dash": s.get("dash", "solid")},
+    style = {"color": s["color"], "width": 2, "dash": s.get("dash", "solid")}
+    style.update(kw.pop("line", {}) or {})
+    return go.Scatter(x=x, y=y, name=name or s["name"], line=style,
                       connectgaps=connectgaps, hovertemplate=hovertemplate,
                       customdata=customdata, **kw)
 

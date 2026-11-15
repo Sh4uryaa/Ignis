@@ -76,3 +76,22 @@ def test_leave_one_year_out_never_uses_held_out_year():
     assert (clean.calibrated_error.abs() < 1e-9).all()
     met = validation_metrics(rows, period=("2012", "2021"), validation_type="supplementary")
     assert (met.validation_type == "supplementary").all()
+
+
+def test_relative_error_zero_safe_and_period_metrics():
+    from processing.harmonize import calibrated_modis_series
+    from processing.validate import calibrated_period_metrics, calibrated_yearly_metrics
+    t = make_totals(years=range(2010, 2027))
+    t.loc[(t.year == 2024) & (t.month == 3), "viirs_snpp_count"] = 0
+    f = calibration_factors(training_pairs(t))
+    rows = validation_months(t, f)
+    zero = rows[(rows.year == 2024) & (rows.month == 3)].iloc[0]
+    assert np.isnan(zero.calibrated_relative_error_pct)
+    assert zero.calibrated_absolute_error == pytest.approx(abs(zero.calibrated_error))
+    s = calibrated_modis_series(t, f)
+    p = calibrated_period_metrics(s).set_index(["region", "comparison_period"])
+    assert p.loc[("Punjab", "training_in_sample"), "wape_pct"] == pytest.approx(0.0)
+    assert p.loc[("Punjab", "validation_out_of_sample"), "n_months"] == 43
+    y = calibrated_yearly_metrics(s)
+    assert set(y.year) == set(range(2012, 2027))
+    assert (y[y.year >= 2023].comparison_period == "validation_out_of_sample").all()

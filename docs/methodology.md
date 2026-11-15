@@ -115,14 +115,44 @@ single constant factor per region (diagnostic baseline).
 | Bias seasonal | +15.4% | −15.0% |
 | WAPE constant factor | 44.5% | 32.9% |
 
-### Orbit drift
+### Calibrated MODIS comparison series
+
+`calibrated_modis_monthly.csv` applies the training factors, unchanged, to every month with
+complete combined Terra + Aqua coverage and an available factor:
+
+$$\text{Calibrated\_MODIS}_{y,m} = M_{y,m} \times r_m$$
+
+Each month is labelled `historical_backcast` (before VIIRS — identical to the harmonized
+estimate), `training_in_sample` (Feb 2012 – Dec 2022, complete overlap — the factors were fitted
+here), `validation_out_of_sample` (Jan 2023 – Jul 2026, complete overlap) or
+`not_a_comparison_month` (e.g. Jan 2012, a partial VIIRS month). Overlap months carry the error,
+absolute error and relative error (%) against actual VIIRS. Factors are never refitted on
+validation data, and the final harmonized record is unchanged: it still uses actual VIIRS
+wherever a complete VIIRS month exists.
+
+`calibrated_modis_period_metrics.csv` and `calibrated_modis_yearly_metrics.csv` give MAE, RMSE,
+WAPE and bias per region for each period and each year.
+
+| WAPE, calibrated MODIS vs VIIRS | Punjab | Haryana |
+|---|---|---|
+| Training years (in-sample), overall | 10.5% | 10.3% |
+| Training years, range of yearly values | 6.9–15.8% | 3.8–15.4% |
+| Held-out 2023 – Jul 2026 (out-of-sample) | 49.1% | 34.0% |
+| Held-out yearly: 2023 / 2024 / 2025 / 2026 (Jan–Jul) | 36.5 / 47.0 / 73.0 / 59.7% | 29.9 / 26.1 / 28.7 / 60.4% |
+
+In-sample agreement is a fit, not a test; the held-out rows are the independent evaluation.
+
+### Overpass timing as a possible contributor
 
 `overpass_times.csv` gives the median daytime detection time per satellite and year. Terra and
 Aqua were stable until about 2021 and then drifted (Aqua ~13:45 → ~15:07 IST in 2025; Terra
 ~11:20 → ~10:06 IST), while Suomi-NPP stayed near 13:40. In Punjab the burning-season V/M ratio
-was 4.3–5.3 every training year and fell to 3.6, 2.2 and 1.3 in 2023–2025. The validation window
-therefore tests the factors under observing conditions different from training. The backcast
-period (2002–2011) has overpass times matching the training years.
+was 4.3–5.3 every training year and 3.6, 2.2 and 1.3 in 2023–2025. The rise in held-out error
+coincides with this drift, but also with changes in burning (Punjab's stubble-burning detections
+fell sharply over the same years), so the drift is treated as a possible contributor to be
+evaluated, not as an established cause, and MODIS detections are not treated as invalid. 2022,
+when Terra had begun to drift, is still within the training-year error range. The backcast period
+(2002–2011) has overpass times matching the training years.
 
 ### Supplementary stable-orbit check
 

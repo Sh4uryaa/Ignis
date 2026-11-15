@@ -265,7 +265,7 @@ APP_DESCRIPTION: str = ("A harmonized historical view of satellite fire detectio
                         "uncover burning patterns across Punjab and Haryana.")
 
 # Colour tokens. Sensor colours are identity colours and are used the same
-# way on every page: MODIS gold, VIIRS orange, harmonized cyan.
+# way on every page: MODIS gold, VIIRS orange, harmonized teal.
 COLORS: dict[str, str] = {
     "background": "#0B0D11",
     "surface": "#14171D",
@@ -276,10 +276,11 @@ COLORS: dict[str, str] = {
     "text": "#F8FAFC",
     "text_muted": "#9AA3B2",
     "modis": "#FACC15",       # MODIS Terra + Aqua (gold)
-    "terra": "#FDE68A",       # Terra — light gold (platform detail)
-    "aqua": "#CA8A04",        # Aqua — deep gold (platform detail)
+    "terra": "#60A5FA",       # Terra — blue (platform detail; distinct from combined gold)
+    "aqua": "#F472B6",        # Aqua — pink (platform detail; distinct from combined gold)
     "viirs": "#F97316",       # VIIRS Suomi-NPP (orange)
-    "harmonized": "#38BDF8",  # harmonized record (cyan)
+    "harmonized": "#2DD4BF",  # harmonized record (teal)
+    "calibrated": "#A78BFA",  # calibrated MODIS = MODIS x factor (purple)
     "positive": "#4CAF7A",
     "negative": "#E5484D",
     "missing": "#2A2F3A",     # unavailable / not harmonized
